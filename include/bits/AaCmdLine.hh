@@ -53,43 +53,35 @@ namespace Aa
       ~MissingMandatoryOption () throw ();
     };
 
-    /// Demangled TargetType typeid.
-    template <class TargetType>
-    inline static std::string strTypeId ()
+    /// Exception thrown when an argument is missing.
+    class MissingArgument : public std::runtime_error
     {
-#if 0 // cxxabi.h
-      int status;
-      char * demangled = abi::__cxa_demangle (typeid (TargetType).name (), NULL, NULL, &status);
-      if (status != 0) return "?";
-      std::string str (demangled);
-      free (demangled);
-      int nsIndex = str.rfind ("::");
-      return '<' + (nsIndex != -1 ? str.substr (nsIndex + 2) : str) + '>';
-#else
-      return "?";
-#endif
-    }
-    
-#if 1
-    template <> inline std::string strTypeId<char>           () {return "<char>";}
-    template <> inline std::string strTypeId<unsigned char>  () {return "<uchar>";}
-    template <> inline std::string strTypeId<int>            () {return "<int>";}
-    template <> inline std::string strTypeId<unsigned int>   () {return "<uint>";}
-    template <> inline std::string strTypeId<short>          () {return "<short>";}
-    template <> inline std::string strTypeId<unsigned short> () {return "<ushort>";}
-    template <> inline std::string strTypeId<long>           () {return "<long>";}
-    template <> inline std::string strTypeId<unsigned long>  () {return "<ulong>";}
-    template <> inline std::string strTypeId<bool>           () {return "<bool>";}
-    template <> inline std::string strTypeId<float>          () {return "<float>";}
-    template <> inline std::string strTypeId<double>         () {return "<double>";}
-    template <> inline std::string strTypeId<std::string>    () {return "<string>";}
-#endif
+      private:
+        static std::string msg (unsigned int min, unsigned int n);
+      public:
+        MissingArgument (unsigned int min, unsigned int n);
+        ~MissingArgument () throw ();
+    };
+
+    /// Exception thrown when an unexpected argument is found.
+    class UnexpectedArgument : public std::runtime_error
+    {
+      private:
+        static std::string msg (unsigned int max, unsigned int n);
+      public:
+        UnexpectedArgument (unsigned int max, unsigned int n);
+        ~UnexpectedArgument () throw ();
+    };
 
     /* StringParser */
 
     /// Functor which translates strings into anything else.
     struct StringParser
     {
+      /// Demangled TargetType typeid.
+      template <class TargetType>
+      inline static std::string TypeId () {return "?";}
+    
       /// Parses a string to construct an object.
       /** @exception FormatError if the string does not match the right format */
       template <class TargetType>
@@ -98,11 +90,24 @@ namespace Aa
         throw (FormatError)
       {
         std::istringstream i (str); i >> (*target) >> std::ws;
-        if (i.fail () || ! i.eof ()) throw FormatError (str, strTypeId<TargetType> ());
+        if (i.fail () || ! i.eof ()) throw FormatError (str, TypeId<TargetType> ());
       }
     };
 
     /* StringParser specializations */
+
+    template <> inline std::string StringParser::TypeId<char>           () {return "<char>";}
+    template <> inline std::string StringParser::TypeId<unsigned char>  () {return "<uchar>";}
+    template <> inline std::string StringParser::TypeId<int>            () {return "<int>";}
+    template <> inline std::string StringParser::TypeId<unsigned int>   () {return "<uint>";}
+    template <> inline std::string StringParser::TypeId<short>          () {return "<short>";}
+    template <> inline std::string StringParser::TypeId<unsigned short> () {return "<ushort>";}
+    template <> inline std::string StringParser::TypeId<long>           () {return "<long>";}
+    template <> inline std::string StringParser::TypeId<unsigned long>  () {return "<ulong>";}
+    template <> inline std::string StringParser::TypeId<bool>           () {return "<bool>";}
+    template <> inline std::string StringParser::TypeId<float>          () {return "<float>";}
+    template <> inline std::string StringParser::TypeId<double>         () {return "<double>";}
+    template <> inline std::string StringParser::TypeId<std::string>    () {return "<string>";}
 
     template <> void StringParser::operator() (const std::string & str, bool        * target) throw (FormatError);
     template <> void StringParser::operator() (const std::string & str, std::string * target) throw (FormatError);
@@ -120,26 +125,33 @@ namespace Aa
     class Parser
     {
     private:
-      std::string _cmd;
-      std::string _abstract;
-      StringList _args;
-      OptionList _options;
-      FilterMap _filters;
-      bool _help;
-      bool _end;
+      std::string m_cmd;
+      std::string m_abstract;
+      StringList m_args;
+      OptionList m_options;
+      FilterMap m_filters;
+      bool m_help;
+      bool m_end;
+      unsigned int m_min, m_max;
+
     private:
       friend class AbstractOption;
       void __add (AbstractOption *) throw (DuplicateKey);
+
     public:
       /// Constructor.
       /** Constructs a new parser with a default help option ("-h" or "--help"). */
-      Parser (const std::string & abstract /** what the program does */);
+      Parser (const std::string & abstract /** what the program does */,
+              unsigned int min = 0         /** minimum number of arguments */,
+              unsigned int max = 1         /** maximum number of arguments */);
       /// Constructor.
       /** Constructs a new parser with a customized help option. */
       Parser (const std::string & abstract        /** what the program does */,
               char helpShortKey                   /** the short name of the help option */,
               const std::string & helpLongKey     /** the long name of the help option */,
-              const std::string & helpDescription /** a description of the help option */)
+              const std::string & helpDescription /** a description of the help option */,
+              unsigned int min = 0                /** minimum number of arguments */,
+              unsigned int max = 1                /** maximum number of arguments */)
         throw (DuplicateKey);
       /// Destructor.
       ~Parser ();
@@ -178,7 +190,7 @@ namespace Aa
         throw (DuplicateKey);
       /// Returns the option associated to a string.
       /** If the string is not a keyword, this method returns NULL. */
-      AbstractOption * getOption (const std::string & s /** the string */) const;
+      AbstractOption * option (const std::string & s /** the string */) const;
       /// Parses the command-line.
       /** @exception NotEnoughValues if an option needs more arguments
           @exception FormatError if an argument does not match the right format
@@ -187,16 +199,16 @@ namespace Aa
                        char ** argv                /** the array of arguments */,
                        StringList * params         /** a list which will receive the parameters */,
                        StringList * ignored = NULL /** a list which will receive the ignored strings */)
-        throw (NotEnoughValues, FormatError, MissingMandatoryOption);
+        throw (NotEnoughValues, FormatError, MissingMandatoryOption, MissingArgument, UnexpectedArgument);
       /// Parses the command-line.
       /** @exception NotEnoughValues if an option needs more arguments
           @exception FormatError if an argument does not match the right format
           @exception MissingMandatoryOption if a mandatory option is missing */
-      std::string operator() (int argc                    /** the number of arguments */,
-                              char ** argv                /** the array of arguments */)
-        throw (NotEnoughValues, FormatError, MissingMandatoryOption);
+      StringList operator() (int argc                    /** the number of arguments */,
+                             char ** argv                /** the array of arguments */)
+        throw (NotEnoughValues, FormatError, MissingMandatoryOption, MissingArgument, UnexpectedArgument);
       /// Returns the command name.
-      inline const std::string & getCmd () const {return _cmd;}
+      inline const std::string & getCmd () const {return m_cmd;}
       /// Displays the usage table.
       /** @param o the output stream */
       void usage (std::ostream & o) const;
@@ -208,12 +220,12 @@ namespace Aa
     class AbstractOption
     {
     protected:
-      Parser * _parser;
-      char _shortKey;
-      std::string _longKey;
-      std::string _description;
-      bool _mandatory;
-      bool _used;
+      Parser * m_parser;
+      char m_shortKey;
+      std::string m_longKey;
+      std::string m_description;
+      bool m_mandatory;
+      bool m_used;
     protected:
       /// Constructor.
       AbstractOption (Parser * parser,
@@ -225,7 +237,7 @@ namespace Aa
       /// Returns the help string of the option.
       virtual std::string getHelp () const = 0;
       /// Returns true if the option has been encountered.
-      inline bool isUsed () const {return _used;}
+      inline bool isUsed () const {return m_used;}
       /// Parses the strings in [first, last).
       /** @exception NotEnoughValues if an option needs more arguments
           @exception FormatError if an argument does not match the right format */
@@ -235,13 +247,13 @@ namespace Aa
       /// Destructor.
       virtual ~AbstractOption ();
       /// Returns the short name of the option.
-      inline char getShort () const {return _shortKey;}
+      inline char getShort () const {return m_shortKey;}
       /// Returns the long name of the option.
-      inline const std::string & getLong () const {return _longKey;}
+      inline const std::string & getLong () const {return m_longKey;}
       /// Returns a description of the option.
-      inline const std::string & getDesc () const {return _description;}
+      inline const std::string & getDesc () const {return m_description;}
       /// Returns true if the option mandatory.
-      inline bool isMandatory () const {return _mandatory;}
+      inline bool isMandatory () const {return m_mandatory;}
     };
 
     /* MultipleOption */
@@ -252,44 +264,44 @@ namespace Aa
       public AbstractOption
     {
     private:
-      const unsigned int _num;
-      TargetType * const _result;
+      const unsigned int m_num;
+      TargetType * const m_result;
     private:
       /// Returns the help string.
       inline std::string getHelp () const
       {
         std::ostringstream o;
-        if (_shortKey != 0)
+        if (m_shortKey != 0)
         {
-          o << '-' << _shortKey;
-          if (! _longKey.empty ()) o << ", " << "--" << _longKey;
+          o << '-' << m_shortKey;
+          if (! m_longKey.empty ()) o << ", " << "--" << m_longKey;
         }
         else
         {
           o << ' ' << ' ';
-          if (! _longKey.empty ()) o << "  " << "--" << _longKey;
+          if (! m_longKey.empty ()) o << "  " << "--" << m_longKey;
         }
-        std::string strType = strTypeId<TargetType> ();
-        for (unsigned int k = _num; k--;) o << ' ' << strType;
+        std::string id = StringParser::TypeId<TargetType> ();
+        for (unsigned int k = m_num; k--;) o << ' ' << id;
         return o.str ();
       }
       /// Parses the strings in [first, last).
       inline StringList::iterator parse (StringList::iterator first, StringList::iterator last)
         throw (NotEnoughValues, FormatError)
       {
-        _used = true;
+        m_used = true;
         StringParser strParser;
-        TargetType * target = _result;
-        for (unsigned int k = _num; k--; ++first)
+        TargetType * target = m_result;
+        for (unsigned int k = m_num; k--; ++first)
           {
             // Has the end of input been reached?
             if (first == last)
-              throw NotEnoughValues (_longKey, _num, strTypeId<TargetType> ());
+              throw NotEnoughValues (m_longKey, m_num, StringParser::TypeId<TargetType> ());
             // Get the next string.
             std::string s = (*first);
             // Is this string a keyword?
-            AbstractOption * o = _parser->getOption (s);
-            if (o != NULL) throw NotEnoughValues (_longKey, _num, strTypeId<TargetType> ());
+            AbstractOption * o = m_parser->option (s);
+            if (o != NULL) throw NotEnoughValues (m_longKey, m_num, StringParser::TypeId<TargetType> ());
             // Parse the string.
             strParser (s, target++);
           }
@@ -306,7 +318,7 @@ namespace Aa
                              bool mandatory                  /** is this option mandatory? */) :
         AbstractOption (parser,
                         shortKey, longKey, description,
-                        mandatory), _num (num), _result (result) {}
+                        mandatory), m_num (num), m_result (result) {}
     };
 
     // MultipleOption<bool> specialization.

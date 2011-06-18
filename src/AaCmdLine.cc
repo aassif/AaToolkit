@@ -53,6 +53,34 @@ namespace Aa
 
     MissingMandatoryOption::~MissingMandatoryOption () throw () {}
 
+    /* MissingArgument */
+
+    string MissingArgument::msg (unsigned int min, unsigned int n)
+    {
+      ostringstream o;
+      o << "missing argument! (" << n << '<' << min << ')';
+      return o.str ();
+    }
+
+    MissingArgument::MissingArgument (unsigned int min, unsigned int n) :
+      runtime_error (MissingArgument::msg (min, n)) {}
+
+    MissingArgument::~MissingArgument () throw () {}
+
+    /* UnexpectedArgument */
+
+    string UnexpectedArgument::msg (unsigned int max, unsigned int n)
+    {
+      ostringstream o;
+      o << "unexpected argument! (" << n << '>' << max << ')';
+      return o.str ();
+    }
+
+    UnexpectedArgument::UnexpectedArgument (unsigned int max, unsigned int n) :
+      runtime_error (UnexpectedArgument::msg (max, n)) {}
+
+    UnexpectedArgument::~UnexpectedArgument () throw () {}
+
     /* AbstractOption */
 
     AbstractOption::AbstractOption (Parser * parser,
@@ -60,55 +88,63 @@ namespace Aa
                                     const string & longKey,
                                     const string & description,
                                     bool mandatory) :
-      _parser (parser),
-      _shortKey (shortKey), _longKey (longKey),
-      _description (description),
-      _mandatory (mandatory),
-      _used (false)
+      m_parser (parser),
+      m_shortKey (shortKey), m_longKey (longKey),
+      m_description (description),
+      m_mandatory (mandatory),
+      m_used (false)
     {
-      _parser->__add (this);
+      m_parser->__add (this);
     }
 
     AbstractOption::~AbstractOption () {}
 
     /* Parser */
 
-    Parser::Parser (const string & abstract) :
-      _cmd (),
-      _abstract (abstract),
-      _args (),
-      _options (),
-      _filters (),
-      _help (false),
-      _end (false)
+    Parser::Parser (const string & abstract,
+                    unsigned int min,
+                    unsigned int max) :
+      m_cmd (),
+      m_abstract (abstract),
+      m_args (),
+      m_options (),
+      m_filters (),
+      m_help (false),
+      m_end (false),
+      m_min (min),
+      m_max (max)
     {
-      this->add ('-', "", "end of parsing", &_end, false);
-      this->add ('h', "help", "this message", &_help, false);
+      this->add ('-', "", "end of parsing", &m_end, false);
+      this->add ('h', "help", "this message", &m_help, false);
     }
 
     Parser::Parser (const string & abstract,
                     char helpShort,
                     const string & helpLong,
-                    const string & helpDescription)
+                    const string & helpDescription,
+                    unsigned int min,
+                    unsigned int max)
       throw (DuplicateKey) :
-      _cmd (),
-      _abstract (abstract),
-      _args (),
-      _options (),
-      _filters (),
-      _help (false),
-      _end (false)
+      m_cmd (),
+      m_abstract (abstract),
+      m_args (),
+      m_options (),
+      m_filters (),
+      m_help (false),
+      m_end (false),
+      m_min (min),
+      m_max (max)
     {
-      this->add ('-', "", "end of parsing", &_end, false);
-      this->add (helpShort, helpLong, helpDescription, &_help, false);
+      this->add ('-', "", "end of parsing", &m_end, false);
+      this->add (helpShort, helpLong, helpDescription, &m_help, false);
     }
 
     Parser::~Parser ()
     {
-      _filters.clear ();
+      m_filters.clear ();
       for (OptionList::iterator
-             i = _options.begin (), e = _options.end (); i != e;) delete *(i++);
-      _options.clear ();
+             i = m_options.begin (), e = m_options.end (); i != e;) delete *(i++);
+      m_options.clear ();
     }
 
     void Parser::__add (AbstractOption * o)
@@ -118,21 +154,21 @@ namespace Aa
       if (shortKey != 0)
       {
         string s1 = string ("-") + shortKey;
-        FilterMap::const_iterator f1 = _filters.find (s1);
-        if (f1 != _filters.end ()) throw DuplicateKey (s1);
-        _filters [s1] = o;
+        FilterMap::const_iterator f1 = m_filters.find (s1);
+        if (f1 != m_filters.end ()) throw DuplicateKey (s1);
+        m_filters [s1] = o;
       }
 
       const string & longKey = o->getLong ();
       if (! longKey.empty ())
       {
         string s2 = string ("--") + longKey; 
-        FilterMap::const_iterator f2 = _filters.find (s2);
-        if (f2 != _filters.end ()) throw DuplicateKey (s2);
-        _filters [s2] = o;
+        FilterMap::const_iterator f2 = m_filters.find (s2);
+        if (f2 != m_filters.end ()) throw DuplicateKey (s2);
+        m_filters [s2] = o;
       }
 
-      _options.push_back (o);
+      m_options.push_back (o);
     }
 
     void Parser::add (char shortKey,
@@ -144,86 +180,89 @@ namespace Aa
       new MultipleOption<bool> (this, shortKey, longKey, description, 0, target, mandatory);
     }
 
-    AbstractOption * Parser::getOption (const string & s) const
+    AbstractOption * Parser::option (const string & s) const
     {
-      FilterMap::const_iterator f = _filters.find (s);
-      return (f != _filters.end ()) ? f->second : NULL;
+      FilterMap::const_iterator f = m_filters.find (s);
+      return (f != m_filters.end ()) ? f->second : NULL;
     }
 
     void Parser::operator() (int argc, char ** argv,
                              StringList * params, StringList * ignored)
-      throw (NotEnoughValues, FormatError, MissingMandatoryOption)
+      throw (NotEnoughValues, FormatError, MissingMandatoryOption, MissingArgument, UnexpectedArgument)
     {
       string absCmd = *(argv++); --argc;
-      _cmd = absCmd.substr (absCmd.rfind ('/') + 1);
-      while (argc--) _args.push_back (*(argv++));
+      m_cmd = absCmd.substr (absCmd.rfind ('/') + 1); // FIXME
+      while (argc--) m_args.push_back (*(argv++));
 
-      list<string> quarantine;
+      // Parameters are quarantined as they are found.
+      // When a new option is found, the quarantine zone is appended to "ignored".
+      // When "--" is found, the remaining args are appended to "params".
+      StringList quarantine;
       try
         {
-          for (StringList::iterator i = _args.begin (), e = _args.end (); i != e;)
+          for (StringList::iterator i = m_args.begin (), e = m_args.end (); i != e;)
             {
               string s = *(i++);
-              AbstractOption * o = this->getOption (s);
+              AbstractOption * o = this->option (s);
               if (o == NULL)
                 quarantine.push_back (s);
               else
                 {
                   i = o->parse (i, e);
-                  if (_end)
+
+                  StringList * dst = (ignored != NULL ? ignored : params);
+                  dst->insert (dst->end (), quarantine.begin (), quarantine.end ());
+                  quarantine.clear ();
+
+                  if (m_end)
                     {
-                      params->insert (params->end (), quarantine.begin (), quarantine.end ());
-                      quarantine.clear ();
                       params->insert (params->end (), i, e);
                       break;
-                    }
-                  else
-                    {
-                      StringList * dst = (ignored != NULL ? ignored : params);
-                      dst->insert (dst->end (), quarantine.begin (), quarantine.end ());
-                      quarantine.clear ();
                     }
                 }
             }
         }
-      catch (NotEnoughValues e) {this->usage (cout); throw;}
-      catch (FormatError e)     {this->usage (cout); throw;}
+      catch (NotEnoughValues & e) {this->usage (cout); throw;}
+      catch (FormatError & e)     {this->usage (cout); throw;}
 
       params->insert (params->end (), quarantine.begin (), quarantine.end ());
       quarantine.clear ();
 
-      if (_help) {this->usage (cout); exit (0);}
+      if (m_help) {this->usage (cout); exit (0);}
 
       for (OptionList::const_iterator
-             i = _options.begin (), e = _options.end (); i != e;)
+             i = m_options.begin (), e = m_options.end (); i != e;)
         {
           AbstractOption * o = *(i++);
-          if (o->isMandatory ())
-            if (! o->isUsed ())
-              {
-                this->usage (cout);
-                throw MissingMandatoryOption ("--" + o->getLong ());
-              }
+          if (o->isMandatory () && ! o->isUsed ())
+            {
+              this->usage (cout);
+              throw MissingMandatoryOption ("--" + o->getLong ());
+            }
         }
+
+      unsigned int n = params->size ();
+      if (n < m_min) throw MissingArgument    (m_min, n);
+      if (n > m_max) throw UnexpectedArgument (m_max, n);
     }
 
-    string Parser::operator() (int argc, char ** argv)
-      throw (NotEnoughValues, FormatError, MissingMandatoryOption)
+    StringList Parser::operator() (int argc, char ** argv)
+      throw (NotEnoughValues, FormatError, MissingMandatoryOption, MissingArgument, UnexpectedArgument)
     {
       StringList arguments;
       this->operator() (argc, argv, &arguments, NULL);
-      return arguments.front (); // FIXME
+      return arguments;
     }
 
     void Parser::usage (ostream & o) const
     {
-      o << "Usage: " << _cmd << " [options] arguments..." << endl << endl;
+      o << "Usage: " << m_cmd << " [options] arguments" << endl << endl;
  
       typedef pair<string, string> StringPair;
       queue<StringPair> q;
       unsigned int maxLength = 0;
       for (OptionList::const_iterator
-             i = ++_options.begin (), e = _options.end (); i != e;) // Skip 1st option ("--").
+             i = ++m_options.begin (), e = m_options.end (); i != e;) // Skip 1st option ("--").
         {
           AbstractOption * option = *(i++);
           string s1 = option->getHelp ();
@@ -246,7 +285,7 @@ namespace Aa
         }
 
       o << endl;
-      o << _abstract << endl;
+      o << m_abstract << endl;
       o << endl;
     }
 
@@ -256,10 +295,10 @@ namespace Aa
     void StringParser::operator() (const string & str, bool * target) throw (FormatError)
     {
       istringstream i (str); string s; i >> s >> ws;
-      if (i.fail () || ! i.eof ()) throw FormatError (str, strTypeId<bool> ());
-      if (str == "true"  || str == "on"  || str == "1") {(*target) = true;  return;}
-      if (str == "false" || str == "off" || str == "0") {(*target) = false; return;}
-      throw FormatError (str, strTypeId<bool> ());
+      if (i.fail () || ! i.eof ()) throw FormatError (str, StringParser::TypeId<bool> ());
+      if (s == "true"  || s == "on"  || s == "1") {(*target) = true;  return;}
+      if (s == "false" || s == "off" || s == "0") {(*target) = false; return;}
+      throw FormatError (str, StringParser::TypeId<bool> ());
     }
 
     template <>
@@ -274,23 +313,23 @@ namespace Aa
     StringList::iterator MultipleOption<bool>::parse (StringList::iterator first, StringList::iterator last)
       throw (NotEnoughValues, FormatError)
     {
-      _used = true;
-      if (_num == 0)
-        (*_result) = true;
+      m_used = true;
+      if (m_num == 0)
+        (*m_result) = true;
       else
         {
           StringParser strParser;
-          bool * target = _result;
-          for (unsigned int k = _num; k--; ++first)
+          bool * target = m_result;
+          for (unsigned int k = m_num; k--; ++first)
             {
               // Has the end of input been reached?
               if (first == last)
-                throw NotEnoughValues (_longKey, _num, strTypeId<bool> ());
+                throw NotEnoughValues (m_longKey, m_num, StringParser::TypeId<bool> ());
               // Get the next string.
               string s = (*first);
               // Is this string a keyword?
-              AbstractOption * o = _parser->getOption (s);
-              if (o != NULL) throw NotEnoughValues (_longKey, _num, strTypeId<bool> ());
+              AbstractOption * o = m_parser->option (s);
+              if (o != NULL) throw NotEnoughValues (m_longKey, m_num, StringParser::TypeId<bool> ());
               // Parse the string.
               strParser (s, target++);
             }
