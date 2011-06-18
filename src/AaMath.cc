@@ -223,25 +223,27 @@ namespace Aa
 
     vR3 operator^ (const vR3 & v, const vR3 & w) {return vR3::CrossProduct (v, w);}
     
-    void toPolar (const pR3 & p, double & theta, double & phi, double & rho)
+    void ToPolar (const pR3 & p, double * ptr_theta, double * ptr_phi, double * ptr_rho)
     {
-      double rhophi, costheta, sinphi;
+      double rho_phi = sqrt (p.x * p.x + p.z * p.z);
+      double rho     = sqrt (p.x * p.x + p.y * p.y + p.z * p.z);
     
-      rhophi = sqrt (p.x * p.x + p.z * p.z);
-      rho    = sqrt (p.x * p.x + p.y * p.y + p.z * p.z);
-    
-      costheta = (rhophi != 0.0 ? p.x / rhophi : 1.0);
-      sinphi   = (rho    != 0.0 ? p.y / rho    : 0.0);
-      theta    = acos (costheta);
-      phi      = asin (sinphi);
+      double cos_theta = (rho_phi != 0.0 ? p.x / rho_phi : 1.0);
+      double sin_phi   = (rho     != 0.0 ? p.y / rho     : 0.0);
+      double theta     = acos (cos_theta);
+      double phi       = asin (sin_phi);
       if (p.z < 0.0) theta = -theta;
+
+      if (ptr_theta != NULL) *ptr_theta = theta;
+      if (ptr_phi   != NULL) *ptr_phi   = phi;
+      if (ptr_rho   != NULL) *ptr_rho   = rho;
     }
     
-    void fromPolar (double theta, double phi, double rho, pR3 & p)
+    pR3 FromPolar (double theta, double phi, double rho)
     {
-      p.x = cos (phi) * cos (theta) * rho;
-      p.z = cos (phi) * sin (theta) * rho;
-      p.y = sin (phi) * rho;
+      return pR3 (cos (phi) * cos (theta) * rho,
+                  sin (phi) * rho,
+                  cos (phi) * sin (theta) * rho);
     }
     
     

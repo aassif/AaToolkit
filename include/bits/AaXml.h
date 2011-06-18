@@ -12,7 +12,7 @@ namespace Aa
   class XmlAttribs
   {
     public:
-      typedef std::map<XmlId, std::string> XmlMap;
+      typedef std::map<XmlId, XmlString> XmlMap;
       typedef XmlMap::/***/ iterator /***/ iterator;
       typedef XmlMap::const_iterator const_iterator;
 

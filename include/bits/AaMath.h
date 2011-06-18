@@ -134,8 +134,8 @@ namespace Aa
     // Square length.
     double operator! (const vR3 &);
     
-    void fromPolar (double theta, double phi, double rho, pR3 &);
-    void toPolar (const pR3 &, double & theta, double & phi, double & rho);
+    pR3 FromPolar (double theta, double phi, double rho);
+    void ToPolar (const pR3 &, double * theta, double * phi, double * rho);
     
     bool operator== (const vR3 &, const vR3 &);
     bool operator!= (const vR3 &, const vR3 &);
@@ -219,7 +219,24 @@ namespace Aa
         void feed (const pR3 &);
         const Box & get () const;
     };  
+
+////////////////////////////////////////////////////////////////////////////////
+// OBB : 3d oriented bounding box //////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+    class OBB
+    {
+      private:
+        pR3 m_pos;
+        vR3 m_axes [3]; // half-extent.
+
+      public:
+        OBB ();
+        OBB (const pR3 &, const vR3 [3]);
+    };
+
   } // namespace Math
 } // namespace Aa
 
 #endif // __AA_MATH__
+
