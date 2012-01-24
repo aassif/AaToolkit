@@ -2,7 +2,7 @@
 #define __AA_TOOLKIT__
 
 #ifdef _WIN32
-  #ifdef AaToolkit_EXPORTS
+  #ifdef AaToolkit_EXPORTS // Merci CMake :)
     #define AA_TOOLKIT_API    __declspec(dllexport)
     #define AA_TOOLKIT_EXTERN
   #else

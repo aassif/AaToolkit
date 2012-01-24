@@ -118,26 +118,26 @@ namespace Aa
 ////////////////////////////////////////////////////////////////////////////////
 
     BaryHelper::BaryHelper () :
-      _point (0.0, 0.0, 0.0),
-      _weight (0.0) {}
+      m_point (0.0, 0.0, 0.0),
+      m_weight (0.0) {}
 
     void BaryHelper::reset ()
     {
-      _point  = pR3 (0.0, 0.0, 0.0);
-      _weight = 0.0;
+      m_point  = pR3 (0.0, 0.0, 0.0);
+      m_weight = 0.0;
     }
 
     void BaryHelper::feed (const pR3 & p, double w)
     {
-      _point.x += p.x;
-      _point.y += p.y;
-      _point.z += p.z;
-      _weight += w;
+      m_point.x += p.x;
+      m_point.y += p.y;
+      m_point.z += p.z;
+      m_weight += w;
     }
 
-    pR3 BaryHelper::getResult () const throw (div_by_zero)
+    pR3 BaryHelper::get () const throw (div_by_zero)
     {
-      return _point / _weight;
+      return m_point / m_weight;
     }
     
 ////////////////////////////////////////////////////////////////////////////////
@@ -361,7 +361,7 @@ namespace Aa
     
     double Box::volume () const
     {
-      return max (m_dim.x, 0.0 ) * max (m_dim.y, 0.0) * max (m_dim.z, 0.0);
+      return max (m_dim.x, 0.0) * max (m_dim.y, 0.0) * max (m_dim.z, 0.0);
     }
     
     bool Box::equals (double px, double py, double pz,
@@ -390,7 +390,7 @@ namespace Aa
     }
     
     bool Box::contains (double px, double py, double pz,
-                         double dx, double dy, double dz) const
+                        double dx, double dy, double dz) const
     {
       if (px < m_pos.x || px + dx > m_pos.x + m_dim.x) return false; 
       if (py < m_pos.y || py + dy > m_pos.y + m_dim.y) return false; 
@@ -479,9 +479,9 @@ namespace Aa
       if (p.y < yMin) yMin = p.y;
       if (p.z < zMin) zMin = p.z;
       m_box = Box (xMin, yMin, zMin,
-                  (p.x > xMax ? p.x : xMax) - xMin,
-                  (p.y > yMax ? p.y : yMax) - yMin,
-                  (p.z > zMax ? p.z : zMax) - zMin);
+                   (p.x > xMax ? p.x : xMax) - xMin,
+                   (p.y > yMax ? p.y : yMax) - yMin,
+                   (p.z > zMax ? p.z : zMax) - zMin);
     }
     
     const Box & BoxHelper::get () const
@@ -490,3 +490,4 @@ namespace Aa
     }
   } // namespace Math
 } // namespace Aa
+

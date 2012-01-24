@@ -76,14 +76,14 @@ namespace Aa
     class AA_TOOLKIT_API BaryHelper
     {
       private:
-        pR3 _point;
-        double _weight;
+        pR3 m_point;
+        double m_weight;
 
       public:
         BaryHelper ();
         void reset ();
-        void feed (const pR3 & p, double w);
-        pR3 getResult () const throw (div_by_zero);
+        void feed (const pR3 & p, double w = 1.0);
+        pR3 get () const throw (div_by_zero);
     };
     
   ////////////////////////////////////////////////////////////////////////////////

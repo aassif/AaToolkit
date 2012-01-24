@@ -21,6 +21,7 @@ OBJ=            $(SRC:%.cc=%.o)
 ALL=            make.depend lib/libAaToolkit.a lib/libAaToolkit.so
 
 all:            $(ALL)
+			make -i -C bin
 
 lib/libAaToolkit.a:   $(OBJ)
 								ar rcs lib/libAaToolkit.a $(OBJ)
