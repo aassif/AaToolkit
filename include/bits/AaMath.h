@@ -19,7 +19,7 @@ namespace Aa
     class pR3;
     class vR3;
 
-    class div_by_zero : public std::runtime_error
+    class AA_TOOLKIT_API div_by_zero : public std::runtime_error
     {
       public:
         div_by_zero ();
@@ -30,7 +30,7 @@ namespace Aa
 // pR3 : 3d point //////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-    class pR3
+    class AA_TOOLKIT_API pR3
     {
       public:
         double x, y, z;
@@ -73,7 +73,7 @@ namespace Aa
 // BaryHelper //////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-    class BaryHelper
+    class AA_TOOLKIT_API BaryHelper
     {
       private:
         pR3 _point;
@@ -90,7 +90,7 @@ namespace Aa
   // vR3 : 3d vector /////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////////
 
-    class vR3
+    class AA_TOOLKIT_API vR3
     {
       public:
         double x, y, z;
@@ -147,7 +147,7 @@ namespace Aa
 // Box : 3d axis-aligned bounding box //////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-    class Box
+    class AA_TOOLKIT_API Box
     {
       private:
         pR3 m_pos;
@@ -197,6 +197,9 @@ namespace Aa
         // I/O.
         void read  (std::istream &);
         void write (std::ostream &) const;
+
+      public:
+        static Box Center (double, double, double);
     };
     
     std::istream & operator >> (std::istream &, Box &);
@@ -206,7 +209,7 @@ namespace Aa
 // BoxHelper : helps computing bounding boxes //////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-    class BoxHelper
+    class AA_TOOLKIT_API BoxHelper
     {
       private:
         bool m_okay;
@@ -224,7 +227,7 @@ namespace Aa
 // OBB : 3d oriented bounding box //////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-    class OBB
+    class AA_TOOLKIT_API OBB
     {
       private:
         pR3 m_pos;

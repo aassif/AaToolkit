@@ -1,5 +1,4 @@
 #include <cmath>
-#include "AaText"
 #include "AaMath"
 
 using namespace std;
@@ -282,7 +281,7 @@ namespace Aa
       m_dim (d) {}
     
     Box::Box (double px, double py, double pz,
-                double dx, double dy, double dz) :
+              double dx, double dy, double dz) :
       m_pos (px, py, pz),
       m_dim (dx, dy, dz)
     {
@@ -436,6 +435,11 @@ namespace Aa
     {
       b.write (o);
       return o;
+    }
+
+    Box Box::Center (double dx, double dy, double dz)
+    {
+      return Box (-0.5 * dx, -0.5 * dy, -0.5 * dz, dx, dy, dz);
     }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -21,10 +21,11 @@ namespace Aa
   std::string printable (const std::string & s /** the string */) throw ();
 
   /// Exception thrown when a file cannot be opened.
-  class FileNotFound : public std::runtime_error
+  class AA_TOOLKIT_API FileNotFound : public std::runtime_error
   {
   private:
-    static std::string msg (const std::string & filename);
+    static std::string Message (const std::string & filename);
+
   public:
     /// Constructor.
     FileNotFound (const std::string & filename /** the file which could not be opened */);
@@ -34,19 +35,38 @@ namespace Aa
   };
 
   /// Exception thrown when something goes wrong while parsing an input.
-  class ParseError : public std::runtime_error
+  class AA_TOOLKIT_API ParseError : public std::runtime_error
   {
   private:
-    static std::string msg (const std::string & expected, const std::string & received);
+    static std::string Message (const std::string & expected, const std::string & received);
 
   public:
     /// Constructor designed for unexpected end-of-file.
-    ParseError (unsigned char expected /** the expected character */);
+    static ParseError Value (unsigned char expected /** the expected character */);
 
     /// Constructor designed for unexpected characters.
-    ParseError (unsigned char expected /** the expected character */,
-                unsigned char received /** the received character */);
+    static ParseError Value (unsigned char expected /** the expected character */,
+                             unsigned char received /** the received character */);
 
+    /// Constructor designed for unexpected end-of-file.
+    static ParseError Value (const std::string & expected /** the expected string */);
+
+    /// Constructor designed for unexpected strings.
+    static ParseError Value (const std::string & expected /** the expected string */,
+                             const std::string & received /** the received string */);
+
+    /// Constructor designed for unexpected end-of-file.
+    static ParseError Type  (const std::string & expected /** the expected string */);
+
+    /// Constructor designed for unexpected characters.
+    static ParseError Type  (const std::string & expected /** the expected string */,
+                             unsigned char       received /** the received string */);
+
+    /// Constructor designed for unexpected strings.
+    static ParseError Type  (const std::string & expected /** the expected string */,
+                             const std::string & received /** the received string */);
+
+  public:
     /// Constructor designed for unexpected end-of-file.
     ParseError (const std::string & expected /** the expected string */);
 
@@ -58,12 +78,13 @@ namespace Aa
     ~ParseError () throw ();
   };
 
+#if 0
   /// Exception thrown when a string could not be translated into another type.
-  class FormatError : public std::invalid_argument
+  class AA_TOOLKIT_API FormatError : public std::invalid_argument
   {
   private:
-    static std::string msg (const std::string & received,
-                            const std::string & expectedType);
+    static std::string Message (const std::string & received,
+                                const std::string & expectedType);
 
   public:
     /// Constructor.
@@ -73,6 +94,8 @@ namespace Aa
     /// Destructor.
     ~FormatError () throw ();
   };
+#endif
+
 }
 
 #endif // __AA_EXCEPTION__

@@ -157,7 +157,7 @@ namespace Aa
       }
 
       double x;
-      if (! (i >> x)) throw ParseError ("<double>", "");
+      if (! (i >> x)) throw ParseError::Type ("<double>", "FIXME");
 
       if (x == (int) x)
       {
@@ -166,7 +166,7 @@ namespace Aa
         if (c2 != '/')
           i.putback (c2);
         else
-          if (! (i >> d)) throw ParseError ("<int>", "");
+          if (! (i >> d)) throw ParseError::Type ("<int>", "FIXME");
         (*this) = Ratio ((int) x, d);
       }
       else

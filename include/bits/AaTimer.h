@@ -5,7 +5,7 @@
 
 namespace Aa
 {
-  class Timer
+  class AA_TOOLKIT_API Timer
   {
    public:
     static double getTime ();

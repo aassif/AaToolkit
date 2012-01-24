@@ -2,48 +2,10 @@
 #include "AaXml"
 
 using namespace std;
+using namespace Aa::TextParsing;
 
 namespace Aa
 {
-  namespace details
-  {
-    void expect (istream & i, char expected) throw (ParseError)
-    {
-      unsigned char c; i >> c;
-      // Has <EOF> been reached?
-      if (i.fail ()) throw ParseError (expected);
-      // Was it the goog character?
-      if (c != expected)
-        {
-          i.putback (c);
-          throw ParseError (expected, c);
-        }
-    }
-
-    void expect (istream & i, const string & expected) throw (ParseError)
-    {
-      string s; i >> s;
-      // Has <EOF> been reached?
-      if (i.fail ()) throw ParseError (expected);
-      // Was it the good string?
-      if (s != expected)
-        {
-          for (string::reverse_iterator
-                 j = s.rbegin (), e = s.rend (); j != e;) i.putback (*(j++));
-          throw ParseError (expected, s);
-        }
-    }
-  }
-
-  void operator>>= (istream & i, char expected) throw (ParseError)
-  {
-    details::expect (i, expected);
-  }
-
-  void operator>>= (istream & i, const string & expected) throw (ParseError)
-  {
-    details::expect (i, expected);
-  }
 
 ////////////////////////////////////////////////////////////////////////////////
 // XmlAttribs //////////////////////////////////////////////////////////////////
@@ -128,8 +90,8 @@ namespace Aa
       ParseText (is);
       tag = ParseTag (is);
     }
-    if (tag.status == XmlTag::END_OF_FILE) throw ParseError ('/' + m_id);
-    if (tag.id != m_id) throw ParseError ('/' + m_id, tag.id);
+    if (tag.status == XmlTag::END_OF_FILE) throw ParseError::Value ('/' + m_id);
+    if (tag.id     != m_id)                throw ParseError::Value ('/' + m_id, tag.id);
   }
 
   void XmlParser::parse (const XmlAttribs & attribs, istream & is)
@@ -144,7 +106,7 @@ namespace Aa
   {
     is >> ws;
     is >>= "<?xml";
-    while (is.get () != '>');
+    while (is.get () != '>') {}
   }
 
   bool accept_id_1st (char c)
@@ -193,7 +155,7 @@ namespace Aa
     {
       switch (c)
       {
-        case -1  : throw ParseError (quote);
+        case -1  : throw ParseError::Value (quote);
         case '&' : text += ParseEntity (is); break;
         default  : text += is.get (); break;
       }
@@ -288,22 +250,22 @@ namespace Aa
 
     // Parse main tag.
     XmlTag tag = XmlParser::ParseTag (is);
-    if (tag.id != p->m_id) throw ParseError (tag.id, p->m_id);
+    if (tag.id != p->m_id) throw ParseError::Value (tag.id, p->m_id);
 
     p->parse (tag.attribs, is);
   }
 
   int XmlParser::ParseInt (const XmlString & xml)
-    throw (FormatError)
+    throw (ParseError)
   {
     int value;
     istringstream iss (xml);
-    if (! (iss >> value)) throw FormatError (xml, "<int>");
+    if (! (iss >> value)) throw ParseError::Type ("<int>", xml);
     return value;
   }
 
   unsigned char XmlParser::ParseHex (char c)
-    throw (FormatError)
+    throw (ParseError)
   {
     switch (c)
     {
@@ -325,13 +287,14 @@ namespace Aa
       case 'F': case 'f': return 15;
 
       default:
-        throw FormatError (printable (c), "<hex-digit>");
+        throw ParseError::Type ("<hex-digit>", c);
     }
   }
 
   unsigned char XmlParser::ParseHex (char high, char low)
-    throw (FormatError)
+    throw (ParseError)
   {
     return 16 * ParseHex (high) + ParseHex (low);
   }
 }
+

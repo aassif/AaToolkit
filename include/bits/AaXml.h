@@ -9,7 +9,7 @@ namespace Aa
   typedef std::string XmlId;
   typedef std::string XmlString;
 
-  class XmlAttribs
+  class AA_TOOLKIT_API XmlAttribs
   {
     public:
       typedef std::map<XmlId, XmlString> XmlMap;
@@ -32,7 +32,7 @@ namespace Aa
       const XmlString & operator[] (const XmlId &) const;
   };
 
-  class XmlTag
+  class AA_TOOLKIT_API XmlTag
   {
     public:
       enum {END_OF_FILE = -1, OPEN = 1, CLOSE = 2, COMMENT = 4};
@@ -44,7 +44,7 @@ namespace Aa
       XmlTag (const XmlId &, const XmlAttribs &, int = XmlTag::OPEN);
   };
 
-  class XmlParser
+  class AA_TOOLKIT_API XmlParser
   {
     protected:
       XmlId m_id;
@@ -78,13 +78,13 @@ namespace Aa
       static void      Skip        (std::istream &, const XmlId &);
       static void      ParseRoot   (std::istream &, XmlParser *) throw (ParseError);
 
-      static int           ParseInt (const XmlString &)    throw (FormatError);
-      static unsigned char ParseHex (char c)               throw (FormatError);
-      static unsigned char ParseHex (char high, char low)  throw (FormatError);
+      static int           ParseInt (const XmlString &)    throw (ParseError);
+      static unsigned char ParseHex (char c)               throw (ParseError);
+      static unsigned char ParseHex (char high, char low)  throw (ParseError);
   };
 
   template <class Data>
-  class XmlParserImpl : public XmlParser
+  class AA_TOOLKIT_API XmlParserImpl : public XmlParser
   {
     protected:
       Data * m_data;

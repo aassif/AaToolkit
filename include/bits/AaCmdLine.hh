@@ -14,7 +14,7 @@ namespace Aa
   namespace CmdLine
   {
     /// Exception thrown when a key is not available.
-    class DuplicateKey : public std::runtime_error
+    class AA_TOOLKIT_API DuplicateKey : public std::runtime_error
     {
     private:
       static std::string msg (const std::string & key);
@@ -83,14 +83,14 @@ namespace Aa
       inline static std::string TypeId () {return "?";}
     
       /// Parses a string to construct an object.
-      /** @exception FormatError if the string does not match the right format */
+      /** @exception ParseError if the string does not match the right format */
       template <class TargetType>
       inline void operator() (const std::string & str /** the input string */,
                               TargetType * target     /** the object which will be constructed from str */)
-        throw (FormatError)
+        throw (ParseError)
       {
         std::istringstream i (str); i >> (*target) >> std::ws;
-        if (i.fail () || ! i.eof ()) throw FormatError (str, TypeId<TargetType> ());
+        if (i.fail () || ! i.eof ()) throw ParseError::Type (TypeId<TargetType> (), str);
       }
     };
 
@@ -109,8 +109,8 @@ namespace Aa
     template <> inline std::string StringParser::TypeId<double>         () {return "<double>";}
     template <> inline std::string StringParser::TypeId<std::string>    () {return "<string>";}
 
-    template <> void StringParser::operator() (const std::string & str, bool        * target) throw (FormatError);
-    template <> void StringParser::operator() (const std::string & str, std::string * target) throw (FormatError);
+    template <> void StringParser::operator() (const std::string & str, bool        * target) throw (ParseError);
+    template <> void StringParser::operator() (const std::string & str, std::string * target) throw (ParseError);
 
     /* Parser */
 
@@ -193,20 +193,20 @@ namespace Aa
       AbstractOption * option (const std::string & s /** the string */) const;
       /// Parses the command-line.
       /** @exception NotEnoughValues if an option needs more arguments
-          @exception FormatError if an argument does not match the right format
+          @exception ParseError if an argument does not match the right format
           @exception MissingMandatoryOption if a mandatory option is missing */
       void operator() (int argc                    /** the number of arguments */,
                        char ** argv                /** the array of arguments */,
                        StringList * params         /** a list which will receive the parameters */,
                        StringList * ignored = NULL /** a list which will receive the ignored strings */)
-        throw (NotEnoughValues, FormatError, MissingMandatoryOption, MissingArgument, UnexpectedArgument);
+        throw (NotEnoughValues, ParseError, MissingMandatoryOption, MissingArgument, UnexpectedArgument);
       /// Parses the command-line.
       /** @exception NotEnoughValues if an option needs more arguments
-          @exception FormatError if an argument does not match the right format
+          @exception ParseError if an argument does not match the right format
           @exception MissingMandatoryOption if a mandatory option is missing */
       StringList operator() (int argc                    /** the number of arguments */,
                              char ** argv                /** the array of arguments */)
-        throw (NotEnoughValues, FormatError, MissingMandatoryOption, MissingArgument, UnexpectedArgument);
+        throw (NotEnoughValues, ParseError, MissingMandatoryOption, MissingArgument, UnexpectedArgument);
       /// Returns the command name.
       inline const std::string & getCmd () const {return m_cmd;}
       /// Displays the usage table.
@@ -240,9 +240,9 @@ namespace Aa
       inline bool isUsed () const {return m_used;}
       /// Parses the strings in [first, last).
       /** @exception NotEnoughValues if an option needs more arguments
-          @exception FormatError if an argument does not match the right format */
+          @exception ParseError if an argument does not match the right format */
       virtual StringList::iterator parse (StringList::iterator first, StringList::iterator last)
-        throw (NotEnoughValues, FormatError) = 0;
+        throw (NotEnoughValues, ParseError) = 0;
     public:
       /// Destructor.
       virtual ~AbstractOption ();
@@ -287,7 +287,7 @@ namespace Aa
       }
       /// Parses the strings in [first, last).
       inline StringList::iterator parse (StringList::iterator first, StringList::iterator last)
-        throw (NotEnoughValues, FormatError)
+        throw (NotEnoughValues, ParseError)
       {
         m_used = true;
         StringParser strParser;
@@ -325,7 +325,7 @@ namespace Aa
 
     template <> StringList::iterator
     MultipleOption<bool>::parse (StringList::iterator first,
-                                 StringList::iterator last) throw (NotEnoughValues, FormatError);
+                                 StringList::iterator last) throw (NotEnoughValues, ParseError);
 
     /* Parser */
 

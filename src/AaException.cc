@@ -1,6 +1,6 @@
 #include <sstream>
 #include <cctype>
-#include "bits/AaException.h"
+#include "AaException"
 
 using namespace std;
 
@@ -29,7 +29,7 @@ namespace Aa
 
   /* FileNotFound */
 
-  string FileNotFound::msg (const string & filename)
+  string FileNotFound::Message (const string & filename)
   {
     ostringstream o;
     o << "file " << printable (filename) << " not found!";
@@ -37,38 +37,72 @@ namespace Aa
   }
 
   FileNotFound::FileNotFound (const string & filename) :
-    runtime_error (FileNotFound::msg (filename)) {}
+    runtime_error (FileNotFound::Message (filename)) {}
 
   FileNotFound::~FileNotFound () throw () {}
 
   /* ParseError */
 
-  string ParseError::msg (const string & expected, const string & received)
+  string ParseError::Message (const string & expected, const string & received)
   {
     ostringstream o;
     o << "expected " << expected << ", got " << received << '!';
     return o.str ();
   }
 
-  ParseError::ParseError (unsigned char expected) :
-    runtime_error (ParseError::msg (printable (expected), "<EOF>")) {}
+  // ParseError::Value
 
-  ParseError::ParseError (unsigned char expected, unsigned char received) :
-    runtime_error (ParseError::msg (printable (expected),
-                                    printable (received))) {}
+  ParseError ParseError::Value (unsigned char expected)
+  {
+    return ParseError (printable (expected));
+  }
+
+  ParseError ParseError::Value (unsigned char expected, unsigned char received)
+  {
+    return ParseError (printable (expected), printable (received));
+  }
+
+  ParseError ParseError::Value (const string & expected)
+  {
+    return ParseError (printable (expected));
+  }
+
+  ParseError ParseError::Value (const string & expected, const string & received)
+  {
+    return ParseError (printable (expected), printable (received));
+  }
+
+  // ParseError::Type
+
+  ParseError ParseError::Type (const string & expected)
+  {
+    return ParseError (expected);
+  }
+
+  ParseError ParseError::Type (const string & expected, unsigned char received)
+  {
+    return ParseError (expected, printable (received));
+  }
+
+  ParseError ParseError::Type (const string & expected, const string & received)
+  {
+    return ParseError (expected, printable (received));
+  }
+
+  // ParseError::ParseError
 
   ParseError::ParseError (const string & expected) :
-    runtime_error (ParseError::msg (printable (expected), "<EOF>")) {}
+    runtime_error (ParseError::Message (expected, "<EOF>")) {}
 
   ParseError::ParseError (const string & expected, const string & received) :
-    runtime_error (ParseError::msg (printable (expected),
-                                    printable (received))) {}
+    runtime_error (ParseError::Message (expected, received)) {}
 
   ParseError::~ParseError () throw () {}
 
+#if 0
   /* FormatError */
 
-  string FormatError::msg (const string & received, const string & expectedType)
+  string FormatError::Message (const string & received, const string & expectedType)
   {
     ostringstream o;
     o << printable (received) << " is not of type " << expectedType << '!';
@@ -76,7 +110,10 @@ namespace Aa
   }
 
   FormatError::FormatError (const string & received, const string & expectedType) :
-    invalid_argument (FormatError::msg (received, expectedType)) {}
+    invalid_argument (FormatError::Message (received, expectedType)) {}
 
   FormatError::~FormatError () throw () {}
+#endif
+
 }
+

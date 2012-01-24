@@ -188,7 +188,7 @@ namespace Aa
 
     void Parser::operator() (int argc, char ** argv,
                              StringList * params, StringList * ignored)
-      throw (NotEnoughValues, FormatError, MissingMandatoryOption, MissingArgument, UnexpectedArgument)
+      throw (NotEnoughValues, ParseError, MissingMandatoryOption, MissingArgument, UnexpectedArgument)
     {
       string absCmd = *(argv++); --argc;
       m_cmd = absCmd.substr (absCmd.rfind ('/') + 1); // FIXME
@@ -223,7 +223,7 @@ namespace Aa
             }
         }
       catch (NotEnoughValues & e) {this->usage (cout); throw;}
-      catch (FormatError & e)     {this->usage (cout); throw;}
+      catch (ParseError      & e) {this->usage (cout); throw;}
 
       params->insert (params->end (), quarantine.begin (), quarantine.end ());
       quarantine.clear ();
@@ -247,7 +247,7 @@ namespace Aa
     }
 
     StringList Parser::operator() (int argc, char ** argv)
-      throw (NotEnoughValues, FormatError, MissingMandatoryOption, MissingArgument, UnexpectedArgument)
+      throw (NotEnoughValues, ParseError, MissingMandatoryOption, MissingArgument, UnexpectedArgument)
     {
       StringList arguments;
       this->operator() (argc, argv, &arguments, NULL);
@@ -292,17 +292,17 @@ namespace Aa
     /* StringParser specializations */
 
     template <>
-    void StringParser::operator() (const string & str, bool * target) throw (FormatError)
+    void StringParser::operator() (const string & str, bool * target) throw (ParseError)
     {
       istringstream i (str); string s; i >> s >> ws;
-      if (i.fail () || ! i.eof ()) throw FormatError (str, StringParser::TypeId<bool> ());
+      if (i.fail () || ! i.eof ()) throw ParseError::Type (StringParser::TypeId<bool> (), str);
       if (s == "true"  || s == "on"  || s == "1") {(*target) = true;  return;}
       if (s == "false" || s == "off" || s == "0") {(*target) = false; return;}
-      throw FormatError (str, StringParser::TypeId<bool> ());
+      throw ParseError::Type (StringParser::TypeId<bool> (), str);
     }
 
     template <>
-    void StringParser::operator() (const string & str, string * target) throw (FormatError)
+    void StringParser::operator() (const string & str, string * target) throw (ParseError)
     {
       (*target) = str;
     }
@@ -311,7 +311,7 @@ namespace Aa
 
     template <>
     StringList::iterator MultipleOption<bool>::parse (StringList::iterator first, StringList::iterator last)
-      throw (NotEnoughValues, FormatError)
+      throw (NotEnoughValues, ParseError)
     {
       m_used = true;
       if (m_num == 0)

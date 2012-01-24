@@ -10,28 +10,35 @@ namespace Aa
 
     void expect (istream & i, unsigned char expected) throw (ParseError)
     {
-      unsigned char c; i >> c;
+      unsigned char c;
+      i >> c;
+
       // Has <EOF> been reached?
-      if (i.fail ()) throw ParseError (expected);
+      if (i.fail ()) throw ParseError::Value (expected);
+
       // Was it the goog character?
       if (c != expected)
         {
           i.putback (c);
-          throw ParseError (expected, c);
+          throw ParseError::Value (expected, c);
         }
     }
 
     void expect (istream & i, const string & expected) throw (ParseError)
     {
-      string s; i >> s;
+      string s;
+      i >> s;
+
       // Has <EOF> been reached?
-      if (i.fail ()) throw ParseError (expected);
+      if (i.fail ()) throw ParseError::Value (expected);
+
       // Was it the good string?
       if (s != expected)
         {
           for (string::reverse_iterator
                  j = s.rbegin (), e = s.rend (); j != e;) i.putback (*(j++));
-          throw ParseError (expected, s);
+
+          throw ParseError::Value (expected, s);
         }
     }
 

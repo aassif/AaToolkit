@@ -2,14 +2,14 @@
 #define __AA_RATIO__
 
 #include <stdexcept>
-#include "AaException.h"
-#include "AaMath.h"
+//#include "AaException.h"
+//#include "AaMath.h"
 
 namespace Aa
 {
   namespace Math
   {
-    class Ratio
+    class AA_TOOLKIT_API Ratio
     {
       private:
         int m_num, m_den;
