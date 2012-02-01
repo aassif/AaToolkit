@@ -25,13 +25,13 @@ namespace Aa
   template <class T>
   T * ADB<T>::New (const T & t) throw (std::bad_alloc)
   {
-#ifdef __PANINI_SMARTPOINTER_DEBUG__
+#ifdef AA_SMARTPOINTER_DEBUG
     std::cout << "ADB::New (" << t << ")\n";
 #endif
     T * data = (T *) malloc (1 * sizeof (T));
     if (data == NULL) throw std::bad_alloc ();
     *data = t;
-#ifdef __PANINI_SMARTPOINTER_DEBUG__
+#ifdef AA_SMARTPOINTER_DEBUG
     std::cout << "  > " << data << std::endl;
 #endif
     return data;
@@ -40,12 +40,12 @@ namespace Aa
   template <class T>
   T * ADB<T>::Alloc (unsigned int n) throw (std::bad_alloc)
   {
-#ifdef __PANINI_SMARTPOINTER_DEBUG__
+#ifdef AA_SMARTPOINTER_DEBUG
     std::cout << "ADB::Alloc (" << n << " * " << sizeof (T) << ")\n";
 #endif
     T * data = (T *) malloc (n * sizeof (T));
     if (data == NULL) throw std::bad_alloc ();
-#ifdef __PANINI_SMARTPOINTER_DEBUG__
+#ifdef AA_SMARTPOINTER_DEBUG
     std::cout << "  > " << data << std::endl;
 #endif
     return data;
@@ -54,7 +54,7 @@ namespace Aa
   template <class T>
   void ADB<T>::Free (T * data)
   {
-#ifdef __PANINI_SMARTPOINTER_DEBUG__
+#ifdef AA_SMARTPOINTER_DEBUG
     std::cout << "ADB::Free (" << data << ")\n";
 #endif
     if (data != NULL) free (data);
@@ -78,12 +78,12 @@ namespace Aa
   template <class T>
   T * ADS<T>::New (const T & t) throw (std::bad_alloc)
   {
-#ifdef __PANINI_SMARTPOINTER_DEBUG__
+#ifdef AA_SMARTPOINTER_DEBUG
     std::cout << "ADS::New (" << t << ")\n";
 #endif
     T * data = new T (t);
     if (data == NULL) throw std::bad_alloc (); // nothrow?
-#ifdef __PANINI_SMARTPOINTER_DEBUG__
+#ifdef AA_SMARTPOINTER_DEBUG
     std::cout << "  > " << data << std::endl;
 #endif
     return data;
@@ -92,7 +92,7 @@ namespace Aa
   template <class T>
   T * ADS<T>::Alloc (unsigned int n) throw (std::bad_alloc)
   {
-#ifdef __PANINI_SMARTPOINTER_DEBUG__
+#ifdef AA_SMARTPOINTER_DEBUG
     std::cout << "ADS::Alloc (" << n << " * " << sizeof (T) << ")\n";
 #endif
     throw std::bad_alloc ();
@@ -102,7 +102,7 @@ namespace Aa
   template <class T>
   void ADS<T>::Free (T * data)
   {
-#ifdef __PANINI_SMARTPOINTER_DEBUG__
+#ifdef AA_SMARTPOINTER_DEBUG
     std::cout << "ADS::Free (" << data << ")\n";
 #endif
     if (data != NULL) delete data;
@@ -126,13 +126,13 @@ namespace Aa
   template <class T>
   T * ADM<T>::New (const T & t) throw (std::bad_alloc)
   {
-#ifdef __PANINI_SMARTPOINTER_DEBUG__
+#ifdef AA_SMARTPOINTER_DEBUG
     std::cout << "ADM::New (" << t << ")\n";
 #endif
     T * data = new T [1];
     if (data == NULL) throw std::bad_alloc (); // nothrow?
     *data = t;
-#ifdef __PANINI_SMARTPOINTER_DEBUG__
+#ifdef AA_SMARTPOINTER_DEBUG
     std::cout << "  > " << data << std::endl;
 #endif
     return data;
@@ -141,12 +141,12 @@ namespace Aa
   template <class T>
   T * ADM<T>::Alloc (unsigned int n) throw (std::bad_alloc)
   {
-#ifdef __PANINI_SMARTPOINTER_DEBUG__
+#ifdef AA_SMARTPOINTER_DEBUG
     std::cout << "ADM::Alloc (" << n << " * " << sizeof (T) << ")\n";
 #endif
     T * data = new T [n];
     if (data == NULL) throw std::bad_alloc (); // nothrow?
-#ifdef __PANINI_SMARTPOINTER_DEBUG__
+#ifdef AA_SMARTPOINTER_DEBUG
     std::cout << "  > " << data << std::endl;
 #endif
     return data;
@@ -155,7 +155,7 @@ namespace Aa
   template <class T>
   void ADM<T>::Free (T * data)
   {
-#ifdef __PANINI_SMARTPOINTER_DEBUG__
+#ifdef AA_SMARTPOINTER_DEBUG
     std::cout << "ADM::Free (" << data << ")\n";
 #endif
     if (data != NULL) delete[] data;
@@ -210,7 +210,7 @@ namespace Aa
   template <class T, class A>
   void SmartPointer<T, A>::connect (T * data)
   {
-#ifdef __PANINI_SMARTPOINTER_DEBUG__
+#ifdef AA_SMARTPOINTER_DEBUG
     std::cout << this << " SmartPointer::connect (data = " << data << ')' << std::endl;
 #endif
 
@@ -229,7 +229,7 @@ namespace Aa
   template <class T, class A>
   void SmartPointer<T, A>::connect (const SmartPointer<T, A> & sp)
   {
-#ifdef __PANINI_SMARTPOINTER_DEBUG__
+#ifdef AA_SMARTPOINTER_DEBUG
     std::cout << this << " SmartPointer::connect (sp = " << &sp << ')' << std::endl;
 #endif
 
@@ -237,7 +237,7 @@ namespace Aa
     {
       m_data = sp.m_data;
       m_refs = sp.m_refs; ++(*m_refs);
-#ifdef __PANINI_SMARTPOINTER_DEBUG__
+#ifdef AA_SMARTPOINTER_DEBUG
       std::cout << "  > refs = " << *m_refs << std::endl;
 #endif
     }
@@ -251,7 +251,7 @@ namespace Aa
   template <class T, class A>
   void SmartPointer<T, A>::disconnect ()
   {
-#ifdef __PANINI_SMARTPOINTER_DEBUG__
+#ifdef AA_SMARTPOINTER_DEBUG
     std::cout << this << " SmartPointer::disconnect () " << std::endl;
 #endif
 
@@ -271,7 +271,7 @@ namespace Aa
   SmartPointer<T, A>::SmartPointer () :
     m_data (NULL), m_refs (NULL)
   {
-#ifdef __PANINI_SMARTPOINTER_DEBUG__
+#ifdef AA_SMARTPOINTER_DEBUG
     std::cout << this << " SmartPointer::SmartPointer ()\n";
 #endif
   }
@@ -280,7 +280,7 @@ namespace Aa
   SmartPointer<T, A>::SmartPointer (const T & t) :
     m_data (NULL), m_refs (NULL)
   {
-#ifdef __PANINI_SMARTPOINTER_DEBUG__
+#ifdef AA_SMARTPOINTER_DEBUG
     std::cout << this << " SmartPointer::SmartPointer (t = " << t << ")\n";
 #endif
     //disconnect (); // inutile.
@@ -291,7 +291,7 @@ namespace Aa
   SmartPointer<T, A>::SmartPointer (const SmartPointer<T, A> & sp) :
     m_data (NULL), m_refs (NULL)
   {
-#ifdef __PANINI_SMARTPOINTER_DEBUG__
+#ifdef AA_SMARTPOINTER_DEBUG
     std::cout << this << " SmartPointer::SmartPointer (sp = " << &sp << ")\n";
 #endif
     //disconnect (); // inutile.
@@ -301,7 +301,7 @@ namespace Aa
   template <class T, class A>
   SmartPointer<T, A>::~SmartPointer ()
   {
-#ifdef __PANINI_SMARTPOINTER_DEBUG__
+#ifdef AA_SMARTPOINTER_DEBUG
     std::cout << this << " SmartPointer::~SmartPointer ()\n";
 #endif
     disconnect ();
@@ -310,7 +310,7 @@ namespace Aa
   template <class T, class A>
   SmartPointer<T, A> & SmartPointer<T, A>::operator= (const SmartPointer<T, A> & sp)
   {
-#ifdef __PANINI_SMARTPOINTER_DEBUG__
+#ifdef AA_SMARTPOINTER_DEBUG
     std::cout << this << " SmartPointer::op= (" << &sp << ")\n";
 #endif
     if (sp.m_data != m_data)
