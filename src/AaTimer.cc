@@ -1,5 +1,7 @@
-#include <sys/time.h>
 #include "AaTimer"
+#ifndef WIN32
+  #include <sys/time.h>
+#endif
 
 namespace Aa
 {

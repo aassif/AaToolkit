@@ -52,22 +52,22 @@ namespace Aa
         pR3 & operator*= (double);
     };
     
-    pR3 operator+ (const pR3 &, const vR3 &);
-    pR3 operator+ (const vR3 &, const pR3 &);
+    AA_TOOLKIT_API pR3 operator+ (const pR3 &, const vR3 &);
+    AA_TOOLKIT_API pR3 operator+ (const vR3 &, const pR3 &);
     //pR3 operator+ (const pR3 &, const pR3 &); // ugly!
     
-    vR3 operator- (const pR3 &, const pR3 &);
+    AA_TOOLKIT_API vR3 operator- (const pR3 &, const pR3 &);
     
-    pR3 operator* (const pR3 &, double);
-    pR3 operator* (double, const pR3 &);
+    AA_TOOLKIT_API pR3 operator* (const pR3 &, double);
+    AA_TOOLKIT_API pR3 operator* (double, const pR3 &);
     
-    pR3 operator/ (const pR3 &, double) throw (div_by_zero);
+    AA_TOOLKIT_API pR3 operator/ (const pR3 &, double) throw (div_by_zero);
     
-    bool operator== (const pR3 &, const pR3 &);
-    bool operator!= (const pR3 &, const pR3 &);
+    AA_TOOLKIT_API bool operator== (const pR3 &, const pR3 &);
+    AA_TOOLKIT_API bool operator!= (const pR3 &, const pR3 &);
     
-    std::istream & operator>> (std::istream &, pR3 &);
-    std::ostream & operator<< (std::ostream &, const pR3 &);
+    AA_TOOLKIT_API std::istream & operator>> (std::istream &, pR3 &);
+    AA_TOOLKIT_API std::ostream & operator<< (std::ostream &, const pR3 &);
 
 ////////////////////////////////////////////////////////////////////////////////
 // BaryHelper //////////////////////////////////////////////////////////////////
@@ -114,34 +114,34 @@ namespace Aa
     };
     
     // Scale.
-    vR3 operator* (const vR3 &, double);
-    vR3 operator* (double, const vR3 &);
+    AA_TOOLKIT_API vR3 operator* (const vR3 &, double);
+    AA_TOOLKIT_API vR3 operator* (double, const vR3 &);
     
-    vR3 operator/ (const vR3 &, double) throw (div_by_zero);
+    AA_TOOLKIT_API vR3 operator/ (const vR3 &, double) throw (div_by_zero);
     
     // Addition.
-    vR3 operator+ (const vR3 &, const vR3 &);
-    vR3 operator- (const vR3 &, const vR3 &);
+    AA_TOOLKIT_API vR3 operator+ (const vR3 &, const vR3 &);
+    AA_TOOLKIT_API vR3 operator- (const vR3 &, const vR3 &);
     
     // Dot product.
-    double operator% (const vR3 &, const vR3 &);
-    double operator% (const vR3 &, const pR3 &);
-    double operator% (const pR3 &, const vR3 &);
+    AA_TOOLKIT_API double operator% (const vR3 &, const vR3 &);
+    AA_TOOLKIT_API double operator% (const vR3 &, const pR3 &);
+    AA_TOOLKIT_API double operator% (const pR3 &, const vR3 &);
     
     // Cross product.
-    vR3 operator^ (const vR3 &, const vR3 &);
+    AA_TOOLKIT_API vR3 operator^ (const vR3 &, const vR3 &);
     
     // Square length.
-    double operator! (const vR3 &);
+    AA_TOOLKIT_API double operator! (const vR3 &);
     
-    pR3 FromPolar (double theta, double phi, double rho);
-    void ToPolar (const pR3 &, double * theta, double * phi, double * rho);
+    AA_TOOLKIT_API pR3 FromPolar (double theta, double phi, double rho);
+    AA_TOOLKIT_API void ToPolar (const pR3 &, double * theta, double * phi, double * rho);
     
-    bool operator== (const vR3 &, const vR3 &);
-    bool operator!= (const vR3 &, const vR3 &);
+    AA_TOOLKIT_API bool operator== (const vR3 &, const vR3 &);
+    AA_TOOLKIT_API bool operator!= (const vR3 &, const vR3 &);
     
-    std::istream & operator>> (std::istream &, vR3 &);
-    std::ostream & operator<< (std::ostream &, const vR3 &);
+    AA_TOOLKIT_API std::istream & operator>> (std::istream &, vR3 &);
+    AA_TOOLKIT_API std::ostream & operator<< (std::ostream &, const vR3 &);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Box : 3d axis-aligned bounding box //////////////////////////////////////////
@@ -202,8 +202,8 @@ namespace Aa
         static Box Center (double, double, double);
     };
     
-    std::istream & operator >> (std::istream &, Box &);
-    std::ostream & operator << (std::ostream &, const Box &);
+    AA_TOOLKIT_API std::istream & operator >> (std::istream &, Box &);
+    AA_TOOLKIT_API std::ostream & operator << (std::ostream &, const Box &);
     
 ////////////////////////////////////////////////////////////////////////////////
 // BoxHelper : helps computing bounding boxes //////////////////////////////////
