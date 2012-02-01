@@ -62,10 +62,10 @@ namespace Aa
   };
 
 ////////////////////////////////////////////////////////////////////////////////
-// PANINI_DECLARE_COLOR ////////////////////////////////////////////////////////
+// AA_DECLARE_COLOR ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-#define PANINI_DECLARE_COLOR(id, n)\
+#define AA_DECLARE_COLOR(id, n)\
 template <typename T>\
 class id\
 {\
@@ -75,13 +75,13 @@ class id\
     typedef V<T, n> Pixel;\
 };
 
-  PANINI_DECLARE_COLOR (RGB,   3);
-  PANINI_DECLARE_COLOR (RGBA,  4);
-  PANINI_DECLARE_COLOR (HSV,   3);
-  PANINI_DECLARE_COLOR (YCbCr, 3);
-  PANINI_DECLARE_COLOR (CMY,   3);
-  PANINI_DECLARE_COLOR (CMYK,  4);
-  PANINI_DECLARE_COLOR (Mono,  1);
+  AA_DECLARE_COLOR (RGB,   3);
+  AA_DECLARE_COLOR (RGBA,  4);
+  AA_DECLARE_COLOR (HSV,   3);
+  AA_DECLARE_COLOR (YCbCr, 3);
+  AA_DECLARE_COLOR (CMY,   3);
+  AA_DECLARE_COLOR (CMYK,  4);
+  AA_DECLARE_COLOR (Mono,  1);
 
   typedef RGB<uint8>   RGB8;
   typedef RGB<float>   RGBf;

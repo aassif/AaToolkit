@@ -46,7 +46,8 @@ clean:
 								rm -f src/*.o
 								rm -f doc/*
 								rm -f $(ALL)
-								find . -name "*~" -exec rm {} \;
+#								find . -name "*~" -exec rm {} \;
+			make -C bin clean
 
 archive:        clean
 								tar zcvf ~/tgz/AaToolkit-$(VER).tgz *
