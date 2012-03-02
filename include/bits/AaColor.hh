@@ -109,6 +109,7 @@ class id\
       DstPixel operator() (const SrcPixel &) const;
   };
 
+  // Conversion via un espace intermédiaire.
   template <class K1, class K2, class K3>
   class ColorConv3
   {
