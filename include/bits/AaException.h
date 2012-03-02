@@ -9,6 +9,8 @@
     and I also include some useful functions. */
 namespace Aa
 {
+  class div_by_zero {};
+
   /// Translate a character into a printable string.
   /** Printable characters are surrounded by single quotes.
       Others are translated into an hex string, preceded by a backslash.
