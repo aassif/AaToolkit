@@ -2,7 +2,6 @@
 #define __AA_BUFFER__
 
 #include <sstream>
-//#include "PaniniSmartPointer.hh"
 
 namespace Aa
 {
@@ -27,9 +26,6 @@ namespace Aa
   template <class T, class A = ADM<T> >
   class Buffer : protected SmartPointer<T, A>
   {
-    private:
-      inline static void CheckRange (unsigned int i, unsigned int n) throw (std::out_of_range);
-
     protected:
       unsigned int m_size;
 
@@ -54,7 +50,8 @@ namespace Aa
 
   template <class T, class A>
   Buffer<T, A>::Buffer (unsigned int n) throw (std::bad_alloc) :
-    SmartPointer<T, A> (), m_size (0)
+    SmartPointer<T, A> (),
+    m_size (0)
   {
 #ifdef AA_BUFFER_DEBUG
     std::cout << this << " Buffer::Buffer (n = " << n << ")\n";
@@ -116,7 +113,8 @@ namespace Aa
 ////////////////////////////////////////////////////////////////////////////////
 
   template <class T, class A>
-  T & Buffer<T, A>::operator[] (unsigned int i) throw (std::out_of_range)
+  T & Buffer<T, A>::operator[] (unsigned int i)
+    throw (std::out_of_range)
   {
 #ifdef AA_BUFFER_DEBUG
     std::cout << this << " Buffer::operator[] (i = " << i << ")\n";
@@ -126,7 +124,8 @@ namespace Aa
   }
 
   template <class T, class A>
-  const T & Buffer<T, A>::operator[] (unsigned int i) const throw (std::out_of_range)
+  const T & Buffer<T, A>::operator[] (unsigned int i) const
+    throw (std::out_of_range)
   {
 #ifdef AA_BUFFER_DEBUG
     std::cout << this << " Buffer::operator[] (i = " << i << ")\n";
