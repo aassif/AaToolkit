@@ -5,10 +5,6 @@
 
 namespace Aa
 {
-  typedef unsigned char  uint8;
-  typedef unsigned short uint16;
-  typedef unsigned long  uint32;
-
 ////////////////////////////////////////////////////////////////////////////////
 // ColorType<T> ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -73,7 +69,7 @@ class id\
     enum {NumComponents = n};\
     typedef T Type;\
     typedef V<T, n> Pixel;\
-};
+} // Semi-colon omitted due to compiler complaints.
 
   AA_DECLARE_COLOR (RGB,   3);
   AA_DECLARE_COLOR (RGBA,  4);
@@ -83,16 +79,20 @@ class id\
   AA_DECLARE_COLOR (CMYK,  4);
   AA_DECLARE_COLOR (Mono,  1);
 
-  typedef RGB<uint8>   RGB8;
-  typedef RGB<float>   RGBf;
-  typedef RGBA<uint8>  RGBA8;
-  typedef RGBA<float>  RGBAf;
-  typedef HSV<uint8>   HSV8;
-  typedef HSV<float>   HSVf;
-  typedef CMY<uint8>   CMY8;
-  typedef CMYK<uint8>  CMYK8;
-  typedef YCbCr<uint8> YCbCr8;
-  typedef Mono<uint8>  Mono8;
+  typedef RGB<uint8>    RGB8;
+  //typedef RGB<uint16>   RGB16;
+  typedef RGB<float>    RGBf;
+  typedef RGBA<uint8>   RGBA8;
+  //typedef RGBA<uint16>  RGBA16;
+  typedef RGBA<float>   RGBAf;
+  typedef HSV<uint8>    HSV8;
+  typedef HSV<float>    HSVf;
+  typedef CMY<uint8>    CMY8;
+  typedef CMYK<uint8>   CMYK8;
+  typedef YCbCr<uint8>  YCbCr8;
+  //typedef YCbCr<uint16> YCbCr16;
+  typedef Mono<uint8>   Mono8;
+  typedef Mono<uint16>  Mono16;
 
 ////////////////////////////////////////////////////////////////////////////////
 // ColorConv ///////////////////////////////////////////////////////////////////
@@ -178,8 +178,8 @@ class id\
       {
         return (rgb [1] > rgb [2] ? 0.0f : 6.0f);
       }
-      inline float offset1 (const SrcPixel & rgb) const {return 2.0f;}
-      inline float offset2 (const SrcPixel & rgb) const {return 4.0f;}
+      inline float offset1 (const SrcPixel &) const {return 2.0f;}
+      inline float offset2 (const SrcPixel &) const {return 4.0f;}
       inline float hue (const SrcPixel & rgb, unsigned int m, float d) const
       {
         switch (m)
@@ -213,9 +213,9 @@ class id\
       typedef RGBf::Pixel DstPixel;
 
     public:
-      DstPixel operator() (const SrcPixel & cmy) const
+      DstPixel operator() (const SrcPixel &) const
       {
-        return vec (0.0f, 0.0f, 0.0f); // TODO
+        return DstPixel (); // TODO
       }
   };
 
