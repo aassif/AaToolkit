@@ -26,7 +26,7 @@ namespace Aa
     };
 
     /// Exception thrown when more values were expected for an option.
-    class NotEnoughValues : public std::runtime_error
+    class AA_TOOLKIT_API NotEnoughValues : public std::runtime_error
     {
     private:
       static std::string msg (const std::string & longKey,
@@ -42,7 +42,7 @@ namespace Aa
     };
 
     /// Exception thrown when a mandatory option is missing.
-    class MissingMandatoryOption : public std::runtime_error
+    class AA_TOOLKIT_API MissingMandatoryOption : public std::runtime_error
     {
     private:
       static std::string msg (const std::string & longKey);
@@ -54,7 +54,7 @@ namespace Aa
     };
 
     /// Exception thrown when an argument is missing.
-    class MissingArgument : public std::runtime_error
+    class AA_TOOLKIT_API MissingArgument : public std::runtime_error
     {
       private:
         static std::string msg (unsigned int min, unsigned int n);
@@ -64,7 +64,7 @@ namespace Aa
     };
 
     /// Exception thrown when an unexpected argument is found.
-    class UnexpectedArgument : public std::runtime_error
+    class AA_TOOLKIT_API UnexpectedArgument : public std::runtime_error
     {
       private:
         static std::string msg (unsigned int max, unsigned int n);
@@ -122,7 +122,7 @@ namespace Aa
 
     /// Command-line parser.
     /** This parser supports many kinds of options. */
-    class Parser
+    class AA_TOOLKIT_API Parser
     {
     private:
       std::string m_cmd;
@@ -217,7 +217,7 @@ namespace Aa
     /* AbstractOption */
 
     /// Abstract option.
-    class AbstractOption
+    class AA_TOOLKIT_API AbstractOption
     {
     protected:
       Parser * m_parser;
@@ -260,7 +260,7 @@ namespace Aa
 
     /// Option with multiple arguments.
     template <class TargetType>
-    class MultipleOption :
+    class AA_TOOLKIT_API MultipleOption :
       public AbstractOption
     {
     private:
