@@ -1,64 +1,80 @@
-VER=            0.0.1
-GPP=            g++ -fPIC -ggdb3 -W -Wall -pedantic -O3
+################################################################################
+# Compilateur ##################################################################
+################################################################################
 
-H_TOOLKIT=          include
-S_TOOLKIT=          src
-D_TOOLKIT=          doc
-I_TOOLKIT=          -I$(H_TOOLKIT)
+GCC_DEFAULT=    g++ -fPIC -W -Wall -pedantic
+GCC_DEBUG=      $(GCC_DEFAULT) -O0 -ggdb3 -pg
+GCC_RELEASE=    $(GCC_DEFAULT) -O3 -ggdb3
+#GCC=            $(GCC_DEBUG)
+GCC=            $(GCC_RELEASE)
 
-#P_GLEW=         $(HOME)/lib/glew
-#I_GLEW=         -I$(P_GLEW)/include
+################################################################################
+# Chemins ######################################################################
+################################################################################
 
-#P_FFMPEG=		$(HOME)/3rdPartyLibs/ffmpeg
-#I_FFMPEG=		-I$(P_FFMPEG) #-I(P_FFMPEG)/libavutil -I$(P_FFMPEG)/libavformat -I$(P_FFMPEG)/libavcodec
-#L_FFMPEG=		-L$(P_FFMPEG)/libavformat -lavformat -L$(P_FFMPEG)/libavcodec -lavcodec -L$(P_FFMPEG)/libavutil -lavutil -lbz2 -lz
+# AaToolkit ####################################################################
 
-# Règles #
+V_AaToolkit=    AaToolkit-0.0.1
+H_AaToolkit=    include
+S_AaToolkit=    src
+D_AaToolkit=    doc
+I_AaToolkit=    -I$(H_AaToolkit)
 
-HDR=            $(wildcard $(H_TOOLKIT)/*.h $(H_TOOLKIT)/*.hh)
-SRC=            $(wildcard $(S_TOOLKIT)/*.cc)
+################################################################################
+# Variables ####################################################################
+################################################################################
+
+HDR=            $(wildcard $(H_AaToolkit)/*.h $(H_AaToolkit)/*.hh)
+SRC=            $(wildcard $(S_AaToolkit)/*.cc)
 OBJ=            $(SRC:%.cc=%.o)
-ALL=            make.depend lib/libAaToolkit.a lib/libAaToolkit.so
+LIB=            lib/libAaToolkit
+STATIC=         $(LIB).a
+SHARED=         $(LIB).so
+ALL=            make.depend $(STATIC) $(SHARED)
+
+################################################################################
+# Règles #######################################################################
+################################################################################
 
 all:            $(ALL)
-			make -i -C bin
+								echo $(HDR)
+								make -i -C bin
 
-lib/libAaToolkit.a:   $(OBJ)
-								ar rcs lib/libAaToolkit.a $(OBJ)
+$(STATIC):      make.depend $(OBJ)
+								ar rcs $(STATIC) $(OBJ)
 
-lib/libAaToolkit.so:  make.depend $(OBJ)
-								$(GPP) -shared $(OBJ) -o lib/libAaToolkit.so
-
-#src/AaFFmpeg.o:            src/AaFFmpeg.cc
-#								g++ -W -Wall -O3 -c $(I_TOOLKIT) $(I_FFMPEG) $(I_GLEW) src/AaFFmpeg.cc -o src/AaFFmpeg.o
-#								g++ -ggdb3 -o0 -c $(I_TOOLKIT) $(I_FFMPEG) $(I_GLEW) src/AaFFmpeg.cc -o src/AaFFmpeg.o
+$(SHARED):      make.depend $(OBJ)
+								$(GCC) -shared $(OBJ) -o $(SHARED)
 
 %.o:            %.cc
-								$(GPP) -c $(I_TOOLKIT) $< -o $@
+								$(GCC) -c $(I_AaToolkit) $< -o $@
 
-# Ménage #
+################################################################################
+# Ménage #######################################################################
+################################################################################
 
 doxygen:                
-								rm -f $(D_TOOLKIT)/*
+								rm -f $(D_AaToolkit)/*
 								doxygen doxygen.cfg
 
 clean:
-								rm -f src/*.o
-								rm -f doc/*
-								rm -f $(ALL)
+								make -C bin clean
+								rm -f $(D_AaToolkit)/*
+								rm -f $(OBJ) $(ALL)
 #								find . -name "*~" -exec rm {} \;
-			make -C bin clean
 
 archive:        clean
-								tar zcvf ~/tgz/AaToolkit-$(VER).tgz *
+								tar zcvf ~/tgz/$(V_AaToolkit).tgz *
 
-# Dépendances #
+################################################################################
+# Dépendances ##################################################################
+################################################################################
 
 dep:
-								$(GPP) -MM $(I_TOOLKIT) $(I_GLEW) $(SRC) >make.depend
+								$(GCC) -MM $(I_AaToolkit) $(SRC) >make.depend
 
 make.depend:    $(HDR) $(SRC)
-								$(GPP) -MM $(I_TOOLKIT) $(I_GLEW) $(SRC) >make.depend
+								$(GCC) -MM $(I_AaToolkit) $(SRC) >make.depend
 
 include make.depend
 

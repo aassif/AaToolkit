@@ -1,117 +1,68 @@
-#GCC_DEFAULT=		g++ -W -Wall -pedantic
-GCC_DEFAULT=		g++
-GCC_DEBUG=		$(GCC_DEFAULT) -ggdb3 -O0# -DDEBUG
-GCC_FINAL=		$(GCC_DEFAULT) -O3
-GCC_GPROF=		$(GCC_FINAL) -pg
-GCC=			$(GCC_DEBUG)
+################################################################################
+# Compilateur ##################################################################
+################################################################################
 
-#QT4=/opt/QtSDK/Desktop/Qt/473/gcc
-#MOC=$(QT4)/bin/moc
+GCC_DEFAULT=    g++ -W -Wall -pedantic
+GCC_DEBUG=      $(GCC_DEFAULT) -O0 -ggdb3 -pg
+GCC_RELEASE=    $(GCC_DEFAULT) -O3 -ggdb3
+#GCC=            $(GCC_DEBUG)
+GCC=            $(GCC_RELEASE)
 
 ################################################################################
 # Chemins ######################################################################
 ################################################################################
 
-#L_X11=			-L/usr/X11R6/lib -lXmu -lXi
-#L_GLU=			-lGL -lGLU -lglut $(L_X11)
+#L_X11=          -L/usr/X11R6/lib -lXmu -lXi
+#L_GLU=          -lGL -lGLU -lglut $(L_X11)
 
 # AaToolkit ####################################################################
 
-P_AaToolkit=			$(HOME)/wrk/toolkit
-I_AaToolkit=			-I$(P_AaToolkit)/include
-L_AaToolkit=			-L$(P_AaToolkit)/lib -lAaToolkit
-
-# AaFFmpeg #####################################################################
-
-#P_FFMPEG=			$(HOME)/3rdPartyLibs/ffmpeg
-#I_FFMPEG=			-I$(P_FFMPEG)
-#L_FFMPEG=			-L$(P_FFMPEG)/libavformat -lavformat\
-							-L$(P_FFMPEG)/libavcodec  -lavcodec\
-							-L$(P_FFMPEG)/libavutil   -lavutil\
-							-L$(P_FFMPEG)/libswscale  -lswscale -lbz2 -lz
-
-#P_AaFFmpeg=			$(HOME)/wrk/ffmpeg
-#I_AaFFmpeg=			-I$(P_AaFFmpeg)/include        $(I_FFMPEG)
-#L_AaFFmpeg=			-L$(P_AaFFmpeg)/lib -lAaFFmpeg $(L_FFMPEG)
-
-# AaGL #########################################################################
-
-#P_GLEW=			$(HOME)/3rdPartyLibs/glew-1.5.8
-#I_GLEW=			-I$(P_GLEW)/include
-#L_GLEW=			-L$(P_GLEW)/lib -lGLEW -lpthread $(L_GLU)
-
-#P_AaGL=			$(HOME)/wrk/opengl
-#I_AaGL=			-I$(P_AaGL)/include    $(I_GLEW) $(I_AaToolkit)
-#L_AaGL=			-L$(P_AaGL)/lib -lAaGL $(L_GLEW) $(L_AaToolkit)
-
-# AaR3d ########################################################################
-
-#P_AaR3d=			$(HOME)/wrk/r3d
-#I_AaR3d=			-I$(P_AaR3d)/include     $(I_AaGL)
-#L_AaR3d=			-L$(P_AaR3d)/lib -lAaR3d $(L_AaGL)
-
-# AaPanini #######################################################################
-
-#P_AaPanini=			$(HOME)/wrk/panini
-#I_AaPanini=			-I$(P_AaPanini)/include                     $(I_AaToolkit)
-#L_AaPanini=			-L$(P_AaPanini)/lib -lAaPanini -ljpeg -lpng $(L_AaToolkit)
+P_AaToolkit=    $(HOME)/wrk/toolkit
+I_AaToolkit=    -I$(P_AaToolkit)/include
+L_AaToolkit=    -L$(P_AaToolkit)/lib -lAaToolkit
 
 ################################################################################
+# Variables ####################################################################
+################################################################################
 
-#I_Qt4=		-I$(QT4)/include\
-					-I$(QT4)/include/QtCore\
-					-I$(QT4)/include/QtXml\
-					-I$(QT4)/include/QtGui\
-					-I$(QT4)/include/QtOpenGL
-#L_Qt4=		-L$(QT4)/lib -lQtCore -lQtOpenGL -lQtXml
-
-#P_QGLViewer=	$(HOME)/3rdPartyLibs/libQGLViewer-2.3.11/QGLViewer
-#I_QGLViewer=	-I$(P_QGLViewer)             $(I_Qt4)
-#L_QGLViewer=	-L$(P_QGLViewer) -lQGLViewer $(L_Qt4)
+EXE=            main
+HDR=            
+SRC=            
+OBJ=            $(HDR:%.h=%.moc.o) $(SRC:%.cc=%.o)
+ALL=            make.depend ../lib/libAaToolkit.so $(EXE)
 
 ################################################################################
 # Règles #######################################################################
 ################################################################################
 
-EXE=			main
-HDR=      #QLutEditor.h \
-					QImageRenderer.h \
-					QR3d.h
-SRC=      #QLutEditor.cc \
-					QImageRenderer.cc \
-					QR3d.cc
-OBJ=      $(HDR:%.h=%.moc.o) \
-					$(SRC:%.cc=%.o)
-ALL=			make.depend $(EXE)
+all:            $(ALL)
 
-all:			$(ALL)
+main:           main.o $(OBJ)
+								$(GCC) $< $(OBJ) $(L_AaToolkit) -o $@
 
-main:		main.o $(OBJ) ../lib/libAaToolkit.so
-			$(GCC) $< $(OBJ) $(L_AaToolkit) -o $@
+%.o:            %.cc
+								$(GCC) -c $(I_AaToolkit) $< -o $@
 
-%.o:			%.cc
-			$(GCC) -c $(I_AaToolkit) $< -o $@
-
-%.moc.cc:			%.h
-			$(MOC) $< -o $@
+%.moc.cc:       %.h
+								$(MOC) $< -o $@
 
 ################################################################################
 # Ménage #######################################################################
 ################################################################################
 
 clean:
-			rm -f $(EXE:%=%.o) $(HDR:%.h=%.moc.cc) $(OBJ) $(ALL)
-			rm -f core *~ gmon.* a.out
+								rm -f $(EXE:%=%.o) $(HDR:%.h=%.moc.cc) $(OBJ) $(ALL)
+								rm -f core *~ gmon.* a.out
 
 ################################################################################
 # Dépendances ##################################################################
 ################################################################################
 
 dep:
-			g++ -MM $(I_AaToolkit) $(SRC) $(EXE:%=%.cc) >make.depend
+								g++ -MM $(I_AaToolkit) $(SRC) $(EXE:%=%.cc) >make.depend
 
-make.depend:		$(SRC) $(EXE:%=%.cc) Makefile
-			g++ -MM $(I_AaToolkit) $(SRC) $(EXE:%=%.cc) >make.depend
+make.depend:    $(SRC) $(EXE:%=%.cc) Makefile
+								g++ -MM $(I_AaToolkit) $(SRC) $(EXE:%=%.cc) >make.depend
 
 include make.depend
 
