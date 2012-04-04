@@ -1,6 +1,8 @@
 #ifndef __AA_IMAGE__
 #define __AA_IMAGE__
 
+//#define AA_IMAGE_DEBUG
+
 #include <vector>
 //#include "PaniniExcept.hh"
 //#include "PaniniSignal.hh"
@@ -36,7 +38,7 @@ namespace Aa
       class FileFormatManager
       {
         private:
-          std::vector<FileFormat *> m_formats;
+          static std::vector<FileFormat *> m_formats;
 
         private:
           FileFormatManager ();
@@ -46,8 +48,8 @@ namespace Aa
           static Im<n, K> Read (std::istream &) throw (ParseError);
           static Im<n, K> Read (const std::string &) throw (FileNotFound, ParseError);
           // Enregistrement.
-          void Write (const Im<n, K> &, std::ostream &) throw ();
-          void Write (const Im<n, K> &, const std::string &) throw (FileNotFound);
+          static void Write (const Im<n, K> &, std::ostream &) throw ();
+          static void Write (const Im<n, K> &, const std::string &) throw (FileNotFound);
       };
 
     public:
@@ -68,8 +70,6 @@ namespace Aa
         return *this;
       }
 #endif
-      const Pixel & operator() (unsigned int x, unsigned int y) const;
-      /***/ Pixel & operator() (unsigned int x, unsigned int y) /***/;
   };
 
   template <unsigned int n, class K>
@@ -81,25 +81,13 @@ namespace Aa
 #endif
   }
 
-  template <unsigned int n, class K>
-  const typename Im<n, K>::Pixel & Im<n, K>::operator() (unsigned int x, unsigned int y) const
-  {
-    return this->operator[] (vec (x, y));
-  }
-
-  template <unsigned int n, class K>
-  typename Im<n, K>::Pixel & Im<n, K>::operator() (unsigned int x, unsigned int y)
-  {
-    return this->operator[] (vec (x, y));
-  }
-
-  typedef Im<2, Mono8> Im256;
-  typedef Im<2, RGB8> ImRGB;
-  typedef Im<2, RGBA8> ImRGBA;
+  typedef Im<2, Mono8>  Im256;
+  typedef Im<2, RGB8>   ImRGB;
+  typedef Im<2, RGBA8>  ImRGBA;
   typedef Im<2, YCbCr8> ImYCbCr;
 
-  template <class K>
-  class ImPalette : public Im256
+  template <unsigned int n, class K>
+  class ImPalette : public Im<n, Mono8>
   {
     public:
       typedef Im<1, K> Palette;
@@ -108,13 +96,13 @@ namespace Aa
       Palette m_palette;
 
     public:
-      ImPalette (unsigned int w, unsigned int h) :
-        Im256 (vec (w, h)),
+      ImPalette (const V<unsigned int, n> & d) :
+        Im<n, Mono8> (d),
         m_palette (256)
       {
       }
-      ImPalette (unsigned int w, unsigned int h, const Palette & p) :
-        Im256 (vec (w, h)),
+      ImPalette (const V<unsigned int, n> & d, const Palette & p) :
+        Im256 (d),
         m_palette (p)
       {
       }
@@ -122,8 +110,8 @@ namespace Aa
       /***/ Palette & palette () /***/ {return m_palette;}
   };
 
-  typedef ImPalette<RGB8> ImPalRGB;
-  typedef ImPalette<RGBA8> ImPalRGBA;
+  typedef ImPalette<2, RGB8>  ImPalRGB;
+  typedef ImPalette<2, RGBA8> ImPalRGBA;
 }
 
 #endif // __AA_IMAGE__
