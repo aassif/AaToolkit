@@ -13,6 +13,24 @@ namespace Aa
   {
     template <unsigned int m>
     inline
+    unsigned int Horner (const V<unsigned int, m> & i,
+                         const V<unsigned int, m> & d,
+                         unsigned int accu)
+    {
+      return Aa::details::Horner<m-1> (i, d, accu * d[m-1] + i[m-1]);
+    }
+
+    template <>
+    inline
+    unsigned int Horner (const V<unsigned int, 1> & i,
+                         const V<unsigned int, 1> & d,
+                         unsigned int accu)
+    {
+      return accu * d + i;
+    }
+
+    template <unsigned int m>
+    inline
     void CheckMultiRange (const V<unsigned int, m> & i,
                           const V<unsigned int, m> & d) throw (std::out_of_range)
     {
@@ -111,7 +129,7 @@ namespace Aa
     std::cout << this << " Table<" << n << ">::operator[] (i = " << i << ")\n";
 #endif
     details::CheckMultiRange (i, m_dims);
-    unsigned int h = V<unsigned int, n>::Horner (i, m_dims, 0);
+    unsigned int h = details::Horner (i, m_dims, 0);
     return this->begin () [h];
   }
 
@@ -123,7 +141,7 @@ namespace Aa
     std::cout << this << " Table<" << n << ">::operator[] (i = " << i << ")\n";
 #endif
     details::CheckMultiRange (i, m_dims);
-    unsigned int h = V<unsigned int, n>::Horner (i, m_dims, 0);
+    unsigned int h = details::Horner (i, m_dims, 0);
     return this->begin () [h];
   }
 }

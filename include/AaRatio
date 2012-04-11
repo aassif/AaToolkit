@@ -1,4 +1,5 @@
 #include "bits/AaToolkit.h"
 #include "bits/AaException.h"
-#include "bits/AaMath.h"
+//#include "bits/AaVector.h"
+//#include "bits/AaMath.h"
 #include "bits/AaRatio.h"

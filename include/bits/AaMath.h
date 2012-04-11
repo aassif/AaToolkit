@@ -1,6 +1,7 @@
 #ifndef __AA_MATH__
 #define __AA_MATH__
 
+#include <cmath>
 #include <iostream>
 #include <stdexcept>
 
@@ -8,21 +9,15 @@ namespace Aa
 {
   namespace Math
   {
-#if 0
-    template <class X>
-    inline const X & MIN (const X & x1, const X & x2) {return (x1 < x2 ? x1 : x2);}
 
-    template <class X>
-    inline const X & MAX (const X & x1, const X & x2) {return (x1 < x2 ? x2 : x1);}
-#endif
-
-    class pR3;
-    class vR3;
+    //class pR3;
+    //class vR3;
 
 ////////////////////////////////////////////////////////////////////////////////
 // pR3 : 3d point //////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
+#if 0
     class AA_TOOLKIT_API pR3
     {
       public:
@@ -61,28 +56,100 @@ namespace Aa
     
     AA_TOOLKIT_API std::istream & operator>> (std::istream &, pR3 &);
     AA_TOOLKIT_API std::ostream & operator<< (std::ostream &, const pR3 &);
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // BaryHelper //////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
+    template <class T, unsigned int m>
     class AA_TOOLKIT_API BaryHelper
     {
+      public:
+        static V<T, m> Barycenter (const V<T, m> & v1,
+                                   const V<T, m> & v2) throw ();
+
+        static V<T, m> Barycenter (const V<T, m> & v1, double w1,
+                                   const V<T, m> & v2, double w2) throw (div_by_zero);
+
+        static V<T, m> Barycenter (const V<T, m> & v1,
+                                   const V<T, m> & v2,
+                                   const V<T, m> & v3) throw ();
+
+        static V<T, m> Barycenter (const V<T, m> & v1, double w1,
+                                   const V<T, m> & v2, double w2,
+                                   const V<T, m> & v3, double w3) throw (div_by_zero);
+
       private:
-        pR3 m_point;
+        V<T, m> m_point;
         double m_weight;
 
       public:
         BaryHelper ();
         void reset ();
-        void feed (const pR3 & p, double w = 1.0);
-        pR3 get () const throw (div_by_zero);
+        void feed (const V<T, m> &, double w = 1.0);
+        V<T, m> get () const throw (div_by_zero);
     };
     
-  ////////////////////////////////////////////////////////////////////////////////
-  // vR3 : 3d vector /////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////////////////
+    template <class T, unsigned int m>
+    V<T, m> BaryHelper<T, m>::Barycenter (const V<T, m> & v1, const V<T, m> & v2) throw ()
+    {
+      return Barycenter (v1, 1.0, v2, 1.0);
+    }
 
+    template <class T, unsigned int m>
+    V<T, m> BaryHelper<T, m>::Barycenter (const V<T, m> & v1, double w1,
+                                          const V<T, m> & v2, double w2) throw (div_by_zero)
+    {
+      return (v1 * w1 + v2 * w2) / (w1 + w2);
+    }
+
+    template <class T, unsigned int m>
+    V<T, m> BaryHelper<T, m>::Barycenter (const V<T, m> & v1, const V<T, m> & v2, const V<T, m> & v3) throw ()
+    {
+      return Barycenter (v1, 1.0, v2, 1.0, v3, 1.0);
+    }
+
+    template <class T, unsigned int m>
+    V<T, m> BaryHelper<T, m>::Barycenter (const V<T, m> & v1, double w1,
+                                          const V<T, m> & v2, double w2,
+                                          const V<T, m> & v3, double w3) throw (div_by_zero)
+    {
+      return (v1 * w1 + v2 * w2 + v3 * w3) / (w1 + w2 + w3);
+    }
+
+    template <class T, unsigned int m>
+    BaryHelper<T, m>::BaryHelper () :
+      m_point (),
+      m_weight (0.0)
+    {
+    }
+
+    template <class T, unsigned int m>
+    void BaryHelper<T, m>::reset ()
+    {
+      m_point  = V<T, m> ();
+      m_weight = 0.0;
+    }
+
+    template <class T, unsigned int m>
+    void BaryHelper<T, m>::feed (const V<T, m> & v, double w)
+    {
+      m_point  += v;
+      m_weight += w;
+    }
+
+    template <class T, unsigned int m>
+    V<T, m> BaryHelper<T, m>::get () const throw (div_by_zero)
+    {
+      return m_point / m_weight;
+    }
+
+////////////////////////////////////////////////////////////////////////////////
+// vR3 : 3d vector /////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+#if 0
     class AA_TOOLKIT_API vR3
     {
       public:
@@ -135,27 +202,55 @@ namespace Aa
     
     AA_TOOLKIT_API std::istream & operator>> (std::istream &, vR3 &);
     AA_TOOLKIT_API std::ostream & operator<< (std::ostream &, const vR3 &);
+#endif
 
+////////////////////////////////////////////////////////////////////////////////
+
+    template <class T>
+    AA_TOOLKIT_API inline
+    V<T, 3> ToPolar (const V<T, 3> & v)
+    {
+      T rho       = v.length ();
+      T rho_phi   = std::sqrt (v[0] * v[0] + v[2] * v[2]);
+      T cos_theta = (rho_phi != 0.0 ? v[0] / rho_phi : 1.0);
+      T sin_phi   = (rho     != 0.0 ? v[1] / rho     : 0.0);
+      T theta     = std::acos (cos_theta);
+      T phi       = std::asin (sin_phi);
+      return vec<T> (v[2] < 0.0 ? -theta : theta, phi, rho);
+    }
+
+    template <class T>
+    AA_TOOLKIT_API inline
+    V<T, 3> FromPolar (const V<T, 3> & v)
+    {
+      T cos_theta   = std::cos (v[0]);
+      T sin_theta   = std::sin (v[0]);
+      T rho_cos_phi = v[2] * std::cos (v[1]);
+      T rho_sin_phi = v[2] * std::sin (v[1]);
+      return vec<T> (rho_cos_phi * cos_theta,
+                     rho_sin_phi,
+                     rho_cos_phi * sin_theta);
+    }
+    
 ////////////////////////////////////////////////////////////////////////////////
 // Box : 3d axis-aligned bounding box //////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
+    template <class T, unsigned int m>
     class AA_TOOLKIT_API Box
     {
       private:
-        pR3 m_pos;
-        vR3 m_dim;
+        V<T, m> m_pos;
+        V<T, m> m_dim;
     
       public:
         Box ();
-        Box (const pR3 &, const vR3 &);
-        Box (double, double, double,
-             double, double, double);
+        Box (const V<T, m> &, const V<T, m> &);
     
         // Translation.
-        void  translate  (const vR3 &);
-        Box & operator+= (const vR3 &);
-        Box   operator+  (const vR3 &) const;
+        void  translate  (const V<T, m> &);
+        Box & operator+= (const V<T, m> &);
+        Box   operator+  (const V<T, m> &) const;
     
         // Union.
         void  unite      (const Box &);
@@ -168,70 +263,282 @@ namespace Aa
         Box   operator&  (const Box &) const;
         
         // Data accessors.
-        const pR3 & pos () const;
-        const vR3 & dim () const;
+        const V<T, m> & pos () const;
+        const V<T, m> & dim () const;
     
         // Volume.
         bool isEmpty () const;
-        double volume () const;
+        T volume () const;
     
         // Equality test.
-        bool equals (double, double, double,
-                     double, double, double) const;
         bool equals     (const Box &) const;
         bool operator== (const Box &) const;
         bool operator!= (const Box &) const;
     
         // Inclusion test.
         bool contains (const Box &) const;
-        bool contains (double, double, double,
-                       double, double, double) const;
     
         // I/O.
         void read  (std::istream &);
         void write (std::ostream &) const;
 
       public:
-        static Box Center (double, double, double);
+        static Box Center (const V<T, m> & dim);
     };
     
-    AA_TOOLKIT_API std::istream & operator >> (std::istream &, Box &);
-    AA_TOOLKIT_API std::ostream & operator << (std::ostream &, const Box &);
+    template <class T, unsigned int m>
+    Box<T, m>::Box () :
+      m_pos (),
+      m_dim ()
+    {
+    }
     
+    template <class T, unsigned int m>
+    Box<T, m>::Box (const V<T, m> & p, const V<T, m> & d) :
+      m_pos (p),
+      m_dim (V<T, m>::Max (V<T, m> (), d))
+    {
+    }
+    
+    template <class T, unsigned int m>
+    void Box<T, m>::translate (const V<T, m> & v)
+    {
+      m_pos += v;
+    }
+    
+    template <class T, unsigned int m>
+    Box<T, m> & Box<T, m>::operator+= (const V<T, m> & v)
+    {
+      this->translate (v);
+      return (*this);
+    }
+    
+    template <class T, unsigned int m>
+    Box<T, m> Box<T, m>::operator+ (const V<T, m> & v) const
+    {
+      return (Box (*this) += v);
+    }
+    
+    // Union.
+    template <class T, unsigned int m>
+    void Box<T, m>::unite (const Box & b)
+    {
+      V<T, m> minimum = V<T, m>::Min (m_pos,         b.m_pos);
+      V<T, m> maximum = V<T, m>::Max (m_pos + m_dim, b.m_pos + b.m_dim);
+      (*this) = Box (minimum, maximum - minimum);
+    }
+    
+    template <class T, unsigned int m>
+    Box<T, m> & Box<T, m>::operator|= (const Box & b)
+    {
+      this->unite (b);
+      return (*this);
+    }
+    
+    template <class T, unsigned int m>
+    Box<T, m> Box<T, m>::operator| (const Box & b) const
+    {
+      return (Box (*this) |= b);
+    }
+    
+    // Intersection.
+    template <class T, unsigned int m>
+    void Box<T, m>::intersect (const Box & b)
+    {
+      V<T, m> minimum = V<T, m>::Max (m_pos,         b.m_pos);
+      V<T, m> maximum = V<T, m>::Min (m_pos + m_dim, b.m_pos + b.m_dim);
+      (*this) = Box (minimum, maximum - minimum);
+    }
+    
+    template <class T, unsigned int m>
+    Box<T, m> & Box<T, m>::operator&= (const Box & b)
+    {
+      this->intersect (b);
+      return (*this);
+    }
+    
+    template <class T, unsigned int m>
+    Box<T, m> Box<T, m>::operator& (const Box & b) const
+    {
+      return (Box<T, m> (*this) &= b);
+    }
+    
+    // Data accessors.
+    template <class T, unsigned int m>
+    const V<T, m> & Box<T, m>::pos () const {return m_pos;}
+
+    template <class T, unsigned int m>
+    const V<T, m> & Box<T, m>::dim () const {return m_dim;}
+    
+    template <class T, unsigned int m>
+    bool Box<T, m>::isEmpty () const
+    {
+      if (m_dim.x <= 0.0) return true;
+      if (m_dim.y <= 0.0) return true;
+      if (m_dim.z <= 0.0) return true;
+      return false;
+    }
+    
+    template <class T, unsigned int m>
+    T Box<T, m>::volume () const
+    {
+      return m_dim.prod ();
+    }
+
+    template <class T, unsigned int m>
+    bool Box<T, m>::equals (const Box & b) const
+    {
+      if (m_pos != b.m_pos) return false;
+      if (m_dim != b.m_dim) return false;
+      return true;
+    }
+    
+    template <class T, unsigned int m>
+    bool Box<T, m>::operator== (const Box & b) const
+    {
+      return this->equals (b);
+    }
+    
+    template <class T, unsigned int m>
+    bool Box<T, m>::operator!= (const Box & b) const
+    {
+      return ! this->equals (b);
+    }
+    
+    template <class T, unsigned int m>
+    bool Box<T, m>::contains (const Box & b) const
+    {
+      if (b.m_pos.x < m_pos.x || b.m_pos.x + b.m_dim.x > m_pos.x + m_dim.x) return false; 
+      if (b.m_pos.y < m_pos.y || b.m_pos.y + b.m_dim.y > m_pos.y + m_dim.y) return false; 
+      if (b.m_pos.z < m_pos.z || b.m_pos.z + b.m_dim.z > m_pos.z + m_dim.z) return false; 
+      return true;
+    }
+    
+    template <class T, unsigned int m>
+    void Box<T, m>::read (std::istream & i)
+    {
+      using namespace TextParsing;
+      i >>= '{';
+      i >> m_pos.x; i >>= ','; i >> m_pos.y; i >>= ','; i >> m_pos.z;
+      i >>= ',';
+      i >> m_dim.x; i >>= ','; i >> m_dim.y; i >>= ','; i >> m_dim.z;
+      i >>= '}';
+    }
+    
+    template <class T, unsigned int m>
+    void Box<T, m>::write (std::ostream & o) const
+    {
+      o << '{'
+        << m_pos.x << ", " << m_pos.y << ", " << m_pos.z
+        << ", "
+        << m_dim.x << ", " << m_dim.y << ", " << m_dim.z
+        << '}';
+    }
+    
+    template <class T, unsigned int m>
+    AA_TOOLKIT_API std::istream & operator >> (std::istream & i, Box<T, m> & b)
+    {
+      b.read (i);
+      return i;
+    }
+    
+    template <class T, unsigned int m>
+    AA_TOOLKIT_API std::ostream & operator << (std::ostream & o, const Box<T, m> & b)
+    {
+      b.write (o);
+      return o;
+    }
+
+    template <class T, unsigned int m>
+    Box<T, m> Box<T, m>::Center (const V<T, m> & dim)
+    {
+      return Box (-0.5 * dim, dim);
+    }
+
 ////////////////////////////////////////////////////////////////////////////////
 // BoxHelper : helps computing bounding boxes //////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
+    template <class T, unsigned int m>
     class AA_TOOLKIT_API BoxHelper
     {
       private:
         bool m_okay;
-        Box m_box;
+        Box<T, m> m_box;
     
       public:
         BoxHelper ();
-        virtual ~BoxHelper ();
         void reset ();
-        void feed (const pR3 &);
-        const Box & get () const;
+        void feed (const V<T, m> &);
+        const Box<T, m> & get () const;
     };  
+
+    template <class T, unsigned int m>
+    BoxHelper<T, m>::BoxHelper () :
+      m_okay (false),
+      m_box ()
+    {
+    }
+
+    template <class T, unsigned int m>
+    void BoxHelper<T, m>::reset ()
+    {
+      m_okay = false;
+      m_box = Box<T, m> ();
+    }
+
+    template <class T, unsigned int m>
+    void BoxHelper<T, m>::feed (const V<T, m> & v)
+    {
+      if (! m_okay)
+      {
+        m_box = Box<T, m> (v, V<T, m> ());
+        m_okay = true;
+      }
+      else
+      {
+        V<T, m> minimum = V<T, m>::Min (v, m_box.pos ());
+        V<T, m> maximum = V<T, m>::Max (v, m_box.pos () + m_box.dim ());
+        m_box = Box<T, m> (minimum, maximum - minimum);
+      }
+    }
+
+    template <class T, unsigned int m>
+    const Box<T, m> & BoxHelper<T, m>::get () const
+    {
+      return m_box;
+    }
 
 ////////////////////////////////////////////////////////////////////////////////
 // OBB : 3d oriented bounding box //////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
+    template <class T, unsigned int m>
     class AA_TOOLKIT_API OBB
     {
       private:
-        pR3 m_pos;
-        vR3 m_axes [3]; // half-extent.
+        V<T, m> m_pos;
+        V<T, m> m_axes [m]; // half-extents.
 
       public:
         OBB ();
-        OBB (const pR3 &, const vR3 [3]);
+        OBB (const V<T, m> &, const V<T, m> [m]);
     };
 
   } // namespace Math
+
+  typedef Math::Box<float,  2>  box2;
+  typedef Math::Box<float,  3>  box3;
+  typedef Math::Box<double, 2> dbox2;
+  typedef Math::Box<double, 3> dbox3;
+  typedef Math::Box<int,    2> ibox2;
+  typedef Math::Box<int,    3> ibox3;
+    
+  typedef Math::OBB<float,  2>  obb2;
+  typedef Math::OBB<float,  3>  obb3;
+  typedef Math::OBB<double, 2> dobb2;
+  typedef Math::OBB<double, 3> dobb3;
+
 } // namespace Aa
 
 #endif // __AA_MATH__

@@ -14,5 +14,14 @@
   #define AA_TOOLKIT_EXTERN
 #endif
 
+namespace Aa
+{
+  typedef unsigned int   uint;
+
+  typedef unsigned char  uint8;
+  typedef unsigned short uint16;
+  typedef unsigned long  uint32;
+}
+
 #endif // __AA_TOOLKIT__
 
