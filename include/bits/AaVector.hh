@@ -89,9 +89,9 @@ namespace Aa
       //inline static Self Id (unsigned int k);
   };
 
-  AA_TOOLKIT_API
   template <class T, class U, unsigned int m>
-  inline AA_VP(T,U,m) operator* (const U & u, const V<T, m> & v)
+  AA_TOOLKIT_API inline
+  AA_VP(T,U,m) operator* (const U & u, const V<T, m> & v)
   {
     return v * u;
   }
@@ -505,14 +505,14 @@ namespace Aa
 #endif
 
   template <class T>
-  AA_TOOLKIT_API
+  AA_TOOLKIT_API inline
   std::ostream & operator<< (std::ostream & os, const V<T, 1> & v)
   {
     return os << '{' << (const T &) v << '}';
   }
 
   template <class T>
-  AA_TOOLKIT_API
+  AA_TOOLKIT_API inline
   std::ostream & operator<< (std::ostream & os, const V<T, 2> & v)
   {
     return os << '{' << v[0] << ", "
@@ -520,7 +520,7 @@ namespace Aa
   }
 
   template <class T>
-  AA_TOOLKIT_API
+  AA_TOOLKIT_API inline
   std::ostream & operator<< (std::ostream & os, const V<T, 3> & v)
   {
     return os << '{' << v[0] << ", "
@@ -529,7 +529,7 @@ namespace Aa
   }
 
   template <class T>
-  AA_TOOLKIT_API
+  AA_TOOLKIT_API inline
   std::ostream & operator<< (std::ostream & os, const V<T, 4> & v)
   {
     return os << '{' << v[0] << ", "
