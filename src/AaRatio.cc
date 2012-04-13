@@ -4,11 +4,6 @@
 
 using namespace std;
 
-#ifndef __MINGW32__
-  #define rint(a) ((a)<0 ? ceil((a)-0.5) : floor((a)+0.5))
-  #define cbrt(a) pow (abs (a), 1.0 / 3.0)
-#endif
-
 namespace Aa
 {
   namespace Math

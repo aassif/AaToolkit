@@ -102,7 +102,7 @@ namespace Aa
       {
       }
       ImPalette (const V<unsigned int, n> & d, const Palette & p) :
-        Im256 (d),
+        Im<n, Mono8> (d),
         m_palette (p)
       {
       }
