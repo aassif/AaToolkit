@@ -16,6 +16,13 @@
   #define AA_TOOLKIT_EXTERN
 #endif
 
+#if defined (_WIN32) && ! defined (__MINGW32__)
+  #define NAN 0.0
+  #define rint(a) floor((a)<0 ? (a)-0.5 : (a)+0.5)
+  #define log2(a) (log((double)a)/log((double)2.0))
+  #define cbrt(a) pow(abs((a)),1.0/3.0)
+#endif
+
 namespace Aa
 {
 #if 1 // __USE_MISC

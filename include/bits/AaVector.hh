@@ -15,7 +15,7 @@ namespace Aa
 ////////////////////////////////////////////////////////////////////////////////
 
   template <class T, unsigned int m>
-  class AA_TOOLKIT_API V : public V<T, m-1>
+  class V : public V<T, m-1>
   {
     private:
       // Vérification d'un indice.
@@ -346,7 +346,7 @@ namespace Aa
 ////////////////////////////////////////////////////////////////////////////////
 
   template <class T>
-  class AA_TOOLKIT_API V<T, 1>
+  class V<T, 1>
   {
     public:
       // Type propre.
