@@ -64,7 +64,7 @@ namespace Aa
   }
 
   template <class T, unsigned int m, unsigned int n>
-  class AA_TOOLKIT_API M : public V<V<T, m>, n>
+  class M : public V<V<T, m>, n>
   {
     public:
       typedef V<T,      m> Column;
@@ -255,45 +255,6 @@ namespace Aa
 // Typedefs (GLSL). ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-#if 0
-  typedef V<vec2,  2>  mat2;
-  typedef V<vec2,  3>  mat2x3;
-  typedef V<vec2,  4>  mat2x4;
-
-  typedef V<vec3,  2>  mat3x2;
-  typedef V<vec3,  3>  mat3;
-  typedef V<vec3,  4>  mat3x4;
-
-  typedef V<vec4,  2>  mat4x2;
-  typedef V<vec4,  3>  mat4x3;
-  typedef V<vec4,  4>  mat4;
-
-  typedef V<dvec2, 2> dmat2;
-  typedef V<dvec2, 3> dmat2x3;
-  typedef V<dvec2, 4> dmat2x4;
-
-  typedef V<dvec3, 2> dmat3x2;
-  typedef V<dvec3, 3> dmat3;
-  typedef V<dvec3, 4> dmat3x4;
-
-  typedef V<dvec4, 2> dmat4x2;
-  typedef V<dvec4, 3> dmat4x3;
-  typedef V<dvec4, 4> dmat4;
-
-  typedef V<ivec2, 2> imat2;
-  typedef V<ivec2, 3> imat2x3;
-  typedef V<ivec2, 4> imat2x4;
-
-  typedef V<ivec3, 2> imat3x2;
-  typedef V<ivec3, 3> imat3;
-  typedef V<ivec3, 4> imat3x4;
-
-  typedef V<ivec4, 2> imat4x2;
-  typedef V<ivec4, 3> imat4x3;
-  typedef V<ivec4, 4> imat4;
-#endif
-
-#if 1
   typedef M<float,  2, 2>  mat2;
   typedef M<float,  2, 3>  mat2x3;
   typedef M<float,  2, 4>  mat2x4;
@@ -329,7 +290,6 @@ namespace Aa
   typedef M<int,    4, 2> imat4x2;
   typedef M<int,    4, 3> imat4x3;
   typedef M<int,    4, 4> imat4;
-#endif
 
 } // namespace Aa
 
