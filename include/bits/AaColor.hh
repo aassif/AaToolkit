@@ -396,9 +396,9 @@ class id\
         uint8 G = rgb [1];
         uint8 B = rgb [2];
         // JPEG Y'CbCr.
-        return vec (Round ( 0.299  * R +  0.587  * G +  0.114  * B),
-                    Round (-0.1687 * R + -0.3313 * G +  0.5    * B + 128.0),
-                    Round ( 0.5    * R + -0.4187 * G + -0.0813 * B + 128.0));
+        return vec (Round ( 0.299f  * R +  0.587f  * G +  0.114f  * B),
+                    Round (-0.1687f * R + -0.3313f * G +  0.5f    * B + 128.0f),
+                    Round ( 0.5f    * R + -0.4187f * G + -0.0813f * B + 128.0f));
       }
   };
 
@@ -417,11 +417,11 @@ class id\
       RGB8::Pixel operator() (const YCbCr8::Pixel & ycc) const
       {
         uint8 Y  = ycc [0];
-        float Cb = ycc [1] - 128.0;
-        float Cr = ycc [2] - 128.0;
-        return vec (Round (Y                 +  1.402   * Cr),
-                    Round (Y + -0.34414 * Cb + -0.71414 * Cr),
-                    Round (Y +  1.772   * Cb));
+        float Cb = ycc [1] - 128.0f;
+        float Cr = ycc [2] - 128.0f;
+        return vec (Round (Y                  +  1.402f   * Cr),
+                    Round (Y + -0.34414f * Cb + -0.71414f * Cr),
+                    Round (Y +  1.772f   * Cb));
       }
   };
 }
