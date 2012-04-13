@@ -66,29 +66,33 @@ namespace Aa
     class AA_TOOLKIT_API BaryHelper
     {
       public:
-        static V<T, m> Barycenter (const V<T, m> & v1,
-                                   const V<T, m> & v2) throw ();
+        inline static
+        V<T, m> Barycenter (const V<T, m> & v1,
+                            const V<T, m> & v2) throw ();
 
-        static V<T, m> Barycenter (const V<T, m> & v1, double w1,
-                                   const V<T, m> & v2, double w2) throw (div_by_zero);
+        inline static
+        V<T, m> Barycenter (const V<T, m> & v1, double w1,
+                            const V<T, m> & v2, double w2) throw (div_by_zero);
 
-        static V<T, m> Barycenter (const V<T, m> & v1,
-                                   const V<T, m> & v2,
-                                   const V<T, m> & v3) throw ();
+        inline static
+        V<T, m> Barycenter (const V<T, m> & v1,
+                            const V<T, m> & v2,
+                            const V<T, m> & v3) throw ();
 
-        static V<T, m> Barycenter (const V<T, m> & v1, double w1,
-                                   const V<T, m> & v2, double w2,
-                                   const V<T, m> & v3, double w3) throw (div_by_zero);
+        inline static
+        V<T, m> Barycenter (const V<T, m> & v1, double w1,
+                            const V<T, m> & v2, double w2,
+                            const V<T, m> & v3, double w3) throw (div_by_zero);
 
       private:
         V<T, m> m_point;
         double m_weight;
 
       public:
-        BaryHelper ();
-        void reset ();
-        void feed (const V<T, m> &, double w = 1.0);
-        V<T, m> get () const throw (div_by_zero);
+        inline BaryHelper ();
+        inline void reset ();
+        inline void feed (const V<T, m> &, double w = 1.0);
+        inline V<T, m> get () const throw (div_by_zero);
     };
     
     template <class T, unsigned int m>
@@ -207,7 +211,7 @@ namespace Aa
 ////////////////////////////////////////////////////////////////////////////////
 
     template <class T>
-    AA_TOOLKIT_API inline
+    AA_TOOLKIT_INLINE
     V<T, 3> ToPolar (const V<T, 3> & v)
     {
       T rho       = v.length ();
@@ -220,7 +224,7 @@ namespace Aa
     }
 
     template <class T>
-    AA_TOOLKIT_API inline
+    AA_TOOLKIT_INLINE
     V<T, 3> FromPolar (const V<T, 3> & v)
     {
       T cos_theta   = std::cos (v[0]);
@@ -244,46 +248,46 @@ namespace Aa
         V<T, m> m_dim;
     
       public:
-        Box ();
-        Box (const V<T, m> &, const V<T, m> &);
+        inline Box ();
+        inline Box (const V<T, m> &, const V<T, m> &);
     
         // Translation.
-        void  translate  (const V<T, m> &);
-        Box & operator+= (const V<T, m> &);
-        Box   operator+  (const V<T, m> &) const;
+        inline void  translate  (const V<T, m> &);
+        inline Box & operator+= (const V<T, m> &);
+        inline Box   operator+  (const V<T, m> &) const;
     
         // Union.
-        void  unite      (const Box &);
-        Box & operator|= (const Box &);
-        Box   operator|  (const Box &) const;
+        inline void  unite      (const Box &);
+        inline Box & operator|= (const Box &);
+        inline Box   operator|  (const Box &) const;
     
         // Intersection.
-        void  intersect  (const Box &);
-        Box & operator&= (const Box &);
-        Box   operator&  (const Box &) const;
+        inline void  intersect  (const Box &);
+        inline Box & operator&= (const Box &);
+        inline Box   operator&  (const Box &) const;
         
         // Data accessors.
-        const V<T, m> & pos () const;
-        const V<T, m> & dim () const;
+        inline const V<T, m> & pos () const;
+        inline const V<T, m> & dim () const;
     
         // Volume.
-        bool isEmpty () const;
-        T volume () const;
+        inline bool empty () const;
+        inline T volume () const;
     
         // Equality test.
-        bool equals     (const Box &) const;
-        bool operator== (const Box &) const;
-        bool operator!= (const Box &) const;
+        inline bool equals     (const Box &) const;
+        inline bool operator== (const Box &) const;
+        inline bool operator!= (const Box &) const;
     
         // Inclusion test.
-        bool contains (const Box &) const;
+        inline bool contains (const Box &) const;
     
         // I/O.
-        void read  (std::istream &);
-        void write (std::ostream &) const;
+        inline void read  (std::istream &);
+        inline void write (std::ostream &) const;
 
       public:
-        static Box Center (const V<T, m> & dim);
+        inline static Box Center (const V<T, m> & dim);
     };
     
     template <class T, unsigned int m>
@@ -371,12 +375,9 @@ namespace Aa
     const V<T, m> & Box<T, m>::dim () const {return m_dim;}
     
     template <class T, unsigned int m>
-    bool Box<T, m>::isEmpty () const
+    bool Box<T, m>::empty () const
     {
-      if (m_dim.x <= 0.0) return true;
-      if (m_dim.y <= 0.0) return true;
-      if (m_dim.z <= 0.0) return true;
-      return false;
+      return volume () == 0;
     }
     
     template <class T, unsigned int m>
@@ -436,14 +437,16 @@ namespace Aa
     }
     
     template <class T, unsigned int m>
-    AA_TOOLKIT_API std::istream & operator >> (std::istream & i, Box<T, m> & b)
+    AA_TOOLKIT_INLINE
+    std::istream & operator >> (std::istream & i, Box<T, m> & b)
     {
       b.read (i);
       return i;
     }
     
     template <class T, unsigned int m>
-    AA_TOOLKIT_API std::ostream & operator << (std::ostream & o, const Box<T, m> & b)
+    AA_TOOLKIT_INLINE
+    std::ostream & operator << (std::ostream & o, const Box<T, m> & b)
     {
       b.write (o);
       return o;
@@ -467,10 +470,10 @@ namespace Aa
         Box<T, m> m_box;
     
       public:
-        BoxHelper ();
-        void reset ();
-        void feed (const V<T, m> &);
-        const Box<T, m> & get () const;
+        inline BoxHelper ();
+        inline void reset ();
+        inline void feed (const V<T, m> &);
+        inline const Box<T, m> & get () const;
     };  
 
     template <class T, unsigned int m>
@@ -521,8 +524,8 @@ namespace Aa
         V<T, m> m_axes [m]; // half-extents.
 
       public:
-        OBB ();
-        OBB (const V<T, m> &, const V<T, m> [m]);
+        inline OBB ();
+        inline OBB (const V<T, m> &, const V<T, m> [m]);
     };
 
   } // namespace Math

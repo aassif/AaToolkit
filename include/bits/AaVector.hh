@@ -90,7 +90,7 @@ namespace Aa
   };
 
   template <class T, class U, unsigned int m>
-  AA_TOOLKIT_API inline
+  AA_TOOLKIT_INLINE
   AA_VP(T,U,m) operator* (const U & u, const V<T, m> & v)
   {
     return v * u;
@@ -414,28 +414,28 @@ namespace Aa
 ////////////////////////////////////////////////////////////////////////////////
 
   template <class T>
-  AA_TOOLKIT_API inline
+  AA_TOOLKIT_INLINE
   V<T, 1> vec (const T & t1)
   {
     return V<T, 1> (t1);
   }
 
   template <class T>
-  AA_TOOLKIT_API inline
+  AA_TOOLKIT_INLINE
   V<T, 2> vec (const T & t1, const T & t2)
   {
     return V<T, 2> (vec (t1), t2);
   }
 
   template <class T>
-  AA_TOOLKIT_API inline
+  AA_TOOLKIT_INLINE
   V<T, 3> vec (const T & t1, const T & t2, const T & t3)
   {
     return V<T, 3> (vec (t1, t2), t3);
   }
 
   template <class T>
-  AA_TOOLKIT_API inline
+  AA_TOOLKIT_INLINE
   V<T, 4> vec (const T & t1, const T & t2, const T & t3, const T & t4)
   {
     return V<T, 4> (vec (t1, t2, t3), t4);
@@ -470,14 +470,14 @@ namespace Aa
 ////////////////////////////////////////////////////////////////////////////////
 
   template <class T, unsigned int m>
-  AA_TOOLKIT_API inline
+  AA_TOOLKIT_INLINE
   T DotProd (const V<T, m> & v1, const V<T, m> & v2)
   {
     return (v1 * v2).sum ();
   }
 
   template <class T>
-  AA_TOOLKIT_API inline
+  AA_TOOLKIT_INLINE
   V<T, 3> CrossProd (const V<T, 3> & v1, const V<T, 3> & v2)
   {
     return vec<T> (v1[1] * v2[2] - v2[1] * v1[2],
@@ -505,14 +505,14 @@ namespace Aa
 #endif
 
   template <class T>
-  AA_TOOLKIT_API inline
+  AA_TOOLKIT_INLINE
   std::ostream & operator<< (std::ostream & os, const V<T, 1> & v)
   {
     return os << '{' << (const T &) v << '}';
   }
 
   template <class T>
-  AA_TOOLKIT_API inline
+  AA_TOOLKIT_INLINE
   std::ostream & operator<< (std::ostream & os, const V<T, 2> & v)
   {
     return os << '{' << v[0] << ", "
@@ -520,7 +520,7 @@ namespace Aa
   }
 
   template <class T>
-  AA_TOOLKIT_API inline
+  AA_TOOLKIT_INLINE
   std::ostream & operator<< (std::ostream & os, const V<T, 3> & v)
   {
     return os << '{' << v[0] << ", "
@@ -529,7 +529,7 @@ namespace Aa
   }
 
   template <class T>
-  AA_TOOLKIT_API inline
+  AA_TOOLKIT_INLINE
   std::ostream & operator<< (std::ostream & os, const V<T, 4> & v)
   {
     return os << '{' << v[0] << ", "

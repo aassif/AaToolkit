@@ -1,6 +1,8 @@
 #ifndef __AA_TOOLKIT__
 #define __AA_TOOLKIT__
 
+#define AA_TOOLKIT_INLINE inline
+
 #ifdef _WIN32
   #ifdef AaToolkit_EXPORTS // Merci CMake :)
     #define AA_TOOLKIT_API    __declspec(dllexport)
@@ -16,7 +18,11 @@
 
 namespace Aa
 {
+#if 1 // __USE_MISC
   typedef unsigned int   uint;
+  typedef unsigned short ushort;
+  typedef unsigned long  ulong;
+#endif
 
   typedef unsigned char  uint8;
   typedef unsigned short uint16;

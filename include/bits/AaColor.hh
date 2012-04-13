@@ -58,10 +58,10 @@ namespace Aa
   };
 
 ////////////////////////////////////////////////////////////////////////////////
-// AA_DECLARE_COLOR ////////////////////////////////////////////////////////////
+// AA_DEFINE_COLOR /////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-#define AA_DECLARE_COLOR(id, n)\
+#define AA_DEFINE_COLOR(id, n)\
 template <typename T>\
 class id\
 {\
@@ -69,15 +69,15 @@ class id\
     enum {NumComponents = n};\
     typedef T Type;\
     typedef V<T, n> Pixel;\
-} // Semi-colon omitted due to compiler complaints.
+};
 
-  AA_DECLARE_COLOR (RGB,   3);
-  AA_DECLARE_COLOR (RGBA,  4);
-  AA_DECLARE_COLOR (HSV,   3);
-  AA_DECLARE_COLOR (YCbCr, 3);
-  AA_DECLARE_COLOR (CMY,   3);
-  AA_DECLARE_COLOR (CMYK,  4);
-  AA_DECLARE_COLOR (Mono,  1);
+  AA_DEFINE_COLOR (RGB,   3)
+  AA_DEFINE_COLOR (RGBA,  4)
+  AA_DEFINE_COLOR (HSV,   3)
+  AA_DEFINE_COLOR (YCbCr, 3)
+  AA_DEFINE_COLOR (CMY,   3)
+  AA_DEFINE_COLOR (CMYK,  4)
+  AA_DEFINE_COLOR (Mono,  1)
 
   typedef RGB<uint8>    RGB8;
   //typedef RGB<uint16>   RGB16;
@@ -93,6 +93,47 @@ class id\
   //typedef YCbCr<uint16> YCbCr16;
   typedef Mono<uint8>   Mono8;
   typedef Mono<uint16>  Mono16;
+
+////////////////////////////////////////////////////////////////////////////////
+// RuntimeColor ////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  typedef enum
+  {
+    RUNTIME_DEFAULT =  0,
+    RUNTIME_MONO8   =  1,
+    RUNTIME_MONO16  =  2,
+    //RUNTIME_MONOf   =  3,
+    //RUNTIME_MONOd   =  4,
+    RUNTIME_RGB8    =  5,
+    //RUNTIME_RGB16   =  6,
+    //RUNTIME_RGBf    =  7,
+    //RUNTIME_RGBd    =  8,
+    RUNTIME_RGBA8   =  9,
+    //RUNTIME_RGBA16  = 10,
+    //RUNTIME_RGBAf   = 11,
+    //RUNTIME_RGBAd   = 12,
+    RUNTIME_YCbCr8  = 13,
+    //RUNTIME_YCbCr16 = 14,
+    //RUNTIME_YCbCrf  = 15,
+    //RUNTIME_YCbCrd  = 16
+    RUNTIME_ERROR   = 17
+  }
+  RuntimeEnum;
+
+  template <RuntimeEnum E> struct RuntimeColor;
+
+#define AA_DEFINE_RUNTIME_COLOR(E, K)\
+  template <> struct RuntimeColor<E> {typedef K ColorSpace;};
+
+  AA_DEFINE_RUNTIME_COLOR (RUNTIME_MONO8,  Mono8)
+  AA_DEFINE_RUNTIME_COLOR (RUNTIME_MONO16, Mono16)
+  AA_DEFINE_RUNTIME_COLOR (RUNTIME_RGB8,   RGB8)
+  AA_DEFINE_RUNTIME_COLOR (RUNTIME_RGBA8,  RGBA8)
+  AA_DEFINE_RUNTIME_COLOR (RUNTIME_YCbCr8, YCbCr8)
+
+#define AA_RUNTIME_COLOR(E) RuntimeColor<E>::ColorSpace
+#define AA_RUNTIME_PIXEL(E) AA_RUNTIME_COLOR(E)::Pixel
 
 ////////////////////////////////////////////////////////////////////////////////
 // ColorConv ///////////////////////////////////////////////////////////////////

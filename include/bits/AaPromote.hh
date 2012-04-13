@@ -5,24 +5,32 @@ namespace Aa
 {
 
   template <class A, class B> struct Promote;
-  //template <> struct Promote<bool,  bool>    {typedef bool   type;};
-  //template <> struct Promote<bool,  int>     {typedef int    type;};
-  //template <> struct Promote<bool,  float>   {typedef float  type;};
-  //template <> struct Promote<bool,  double>  {typedef double type;};
-  //template <> struct Promote<int,   bool>    {typedef int    type;};
-  template <> struct Promote<int,   int>     {typedef int    type;};
-  template <> struct Promote<int,   float>   {typedef float  type;};
-  template <> struct Promote<int,   double>  {typedef double type;};
-  //template <> struct Promote<float, bool>    {typedef float  type;};
-  template <> struct Promote<float, int>     {typedef float  type;};
-  template <> struct Promote<float, float>   {typedef float  type;};
-  template <> struct Promote<float, double>  {typedef double type;};
-  //template <> struct Promote<double, bool>   {typedef double type;};
-  template <> struct Promote<double, int>    {typedef double type;};
-  template <> struct Promote<double, float>  {typedef double type;};
-  template <> struct Promote<double, double> {typedef double type;};
 
-#define AA_PROMOTE(T, U) typename Promote<T, U>::type
+#define AA_DEFINE_PROMOTE(A, B, C)\
+  template <> struct Promote<A, B> {typedef C Type;};
+
+  //AA_DEFINE_PROMOTE (bool,  bool,    bool)
+  //AA_DEFINE_PROMOTE (bool,  int,     int)
+  //AA_DEFINE_PROMOTE (bool,  float,   float)
+  //AA_DEFINE_PROMOTE (bool,  double,  double)
+
+  //AA_DEFINE_PROMOTE (int,   bool,    int)
+  AA_DEFINE_PROMOTE (int,   int,     int)
+  AA_DEFINE_PROMOTE (int,   float,   float)
+  AA_DEFINE_PROMOTE (int,   double,  double)
+
+  //AA_DEFINE_PROMOTE (float, bool,    float)
+  AA_DEFINE_PROMOTE (float, int,     float)
+  AA_DEFINE_PROMOTE (float, float,   float)
+  AA_DEFINE_PROMOTE (float, double,  double)
+
+  //AA_DEFINE_PROMOTE (double, bool,   double)
+  AA_DEFINE_PROMOTE (double, int,    double)
+  AA_DEFINE_PROMOTE (double, float,  double)
+  AA_DEFINE_PROMOTE (double, double, double)
+
+#define AA_PROMOTE(T, U) typename Promote<T, U>::Type
+
 }
 
 #endif // __AA_PROMOTE__
