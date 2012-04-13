@@ -66,9 +66,9 @@ namespace Aa
     public:
       Table (const V<unsigned int, n> & d) throw (std::bad_alloc);
       // Gestion du buffer.
-      void alloc (unsigned int);
-      void alloc (const V<unsigned int, n> & d);
-      void disconnect ();
+      inline void alloc (unsigned int);
+      inline void alloc (const V<unsigned int, n> & d);
+      inline void disconnect ();
       // Dimensions.
       inline V<unsigned int, n> dims () const {return m_dims;}
       inline unsigned int dim (unsigned int k) const {return m_dims [k];}

@@ -5,19 +5,28 @@ namespace Aa
 {
   namespace details
   {
-    template <class T, unsigned int m>
+
+////////////////////////////////////////////////////////////////////////////////
+// AA_VECTOR_ID (T, m, k) //////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+#define AA_VECTOR_ID(T, m, k) VectorId<m>::template Id<T> (k)
+
+    template <unsigned int m>
     struct VectorId
     {
+      template <class T>
       inline static
       V<T, m> Id (unsigned int k)
       {
-        return V<T, m> (VectorId<T, m-1>::Id (k), k == m-1 ? 1 : 0);
+        return V<T, m> (AA_VECTOR_ID (T, m-1, k), k == m-1 ? 1 : 0);
       }
     };
 
-    template <class T>
-    struct VectorId<T, 1>
+    template <>
+    struct VectorId<1>
     {
+      template <class T>
       inline static
       V<T, 1> Id (unsigned int k)
       {
@@ -25,23 +34,31 @@ namespace Aa
       }
     };
 
-    template <class T, unsigned int m, unsigned int n>
+////////////////////////////////////////////////////////////////////////////////
+// AA_MATRIX_ID (T, m, n) //////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+#define AA_MATRIX_ID(T, m, n) MatrixId<m, n>::template Id<T> ()
+
+    template <unsigned int m, unsigned int n>
     struct MatrixId
     {
+      template <class T>
       inline static
       V<V<T, m>, n> Id ()
       {
-        return V<V<T, m>, n> (MatrixId<T, m, n-1>::Id (), VectorId<T, m>::Id (n-1));
+        return V<V<T, m>, n> (AA_MATRIX_ID (T, m, n-1), AA_VECTOR_ID (T, m, n-1));
       }
     };
 
-    template <class T, unsigned int m>
-    struct MatrixId<T, m, 1>
+    template <unsigned int m>
+    struct MatrixId<m, 1>
     {
+      template <class T>
       inline static
       V<V<T, m>, 1> Id ()
       {
-        return V<V<T, m>, 1> (VectorId<T, m>::Id (0));
+        return V<V<T, m>, 1> (AA_VECTOR_ID (T, m, 0));
       }
     };
   }
@@ -58,7 +75,7 @@ namespace Aa
       inline static
       Parent Id ()
       {
-        return details::MatrixId<T, m, n>::Id ();
+        return details::AA_MATRIX_ID (T, m, n);
       }
 
     public:
@@ -134,7 +151,7 @@ namespace Aa
 ////////////////////////////////////////////////////////////////////////////////
 
   template <class T, unsigned int m, unsigned int n>
-  AA_TOOLKIT_API inline
+  AA_TOOLKIT_INLINE
   V<T, m> operator* (const M<T, m, n> & m1, const V<T, n> & v1)
   {
     V<T, m> v2;
@@ -146,7 +163,7 @@ namespace Aa
   }
 
   template <class T, unsigned int m, unsigned int n, unsigned int p>
-  AA_TOOLKIT_API inline
+  AA_TOOLKIT_INLINE
   M<T, m, p> operator* (const M<T, m, n> & m1, const M<T, n, p> & m2)
   {
     M<T, m, p> m3;
@@ -162,28 +179,28 @@ namespace Aa
 ////////////////////////////////////////////////////////////////////////////////
 
   template <class T, unsigned int m>
-  AA_TOOLKIT_API inline
+  AA_TOOLKIT_INLINE
   M<T, m, 1> mat (const V<T, m> & c1)
   {
     return M<T, m, 1> (vec (c1));
   }
 
   template <class T, unsigned int m>
-  AA_TOOLKIT_API inline
+  AA_TOOLKIT_INLINE
   M<T, m, 2> mat (const V<T, m> & c1, const V<T, m> & c2)
   {
     return M<T, m, 2> (vec (c1, c2));
   }
 
   template <class T, unsigned int m>
-  AA_TOOLKIT_API inline
+  AA_TOOLKIT_INLINE
   M<T, m, 3> mat (const V<T, m> & c1, const V<T, m> & c2, const V<T, m> & c3)
   {
     return M<T, m, 3> (vec (c1, c2, c3));
   }
 
   template <class T, unsigned int m>
-  AA_TOOLKIT_API inline
+  AA_TOOLKIT_INLINE
   M<T, m, 4> mat (const V<T, m> & c1, const V<T, m> & c2, const V<T, m> & c3, const V<T, m> & c4)
   {
     return M<T, m, 4> (vec (c1, c2, c3, c4));
@@ -194,7 +211,7 @@ namespace Aa
 ////////////////////////////////////////////////////////////////////////////////
 
   template <class T>
-  AA_TOOLKIT_API inline
+  AA_TOOLKIT_INLINE
   M<T, 4, 4> Translation (const T & tx, const T & ty, const T & tz)
   {
     return mat (vec<T> (0,  0,  0,  0),
@@ -204,7 +221,7 @@ namespace Aa
   }
 
   template <class T>
-  AA_TOOLKIT_API inline
+  AA_TOOLKIT_INLINE
   M<T, 4, 4> Rotation (const T & angle, const V<T, 3> & axis)
     throw (div_by_zero)
   {
@@ -218,7 +235,7 @@ namespace Aa
   }
 
   template <class T>
-  AA_TOOLKIT_API inline
+  AA_TOOLKIT_INLINE
   M<T, 4, 4> Scale (const T & sx, const T & sy, const T & sz)
   {
     return mat (vec<T> (sx, 0,  0,  0),
@@ -228,7 +245,7 @@ namespace Aa
   }
 
   template <class T>
-  AA_TOOLKIT_API inline
+  AA_TOOLKIT_INLINE
   M<T, 4, 4> Scale (const T & t)
   {
     return Scale (t, t, t);

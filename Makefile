@@ -37,7 +37,7 @@ ALL=            make.depend $(STATIC) $(SHARED)
 ################################################################################
 
 all:            $(ALL)
-								echo $(HDR)
+#								echo $(HDR)
 								make -i -C bin
 
 $(STATIC):      make.depend $(OBJ)
