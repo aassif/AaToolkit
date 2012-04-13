@@ -26,7 +26,7 @@ namespace Aa
                          const V<unsigned int, 1> & d,
                          unsigned int accu)
     {
-      return accu * d + i;
+      return d * accu + i;
     }
 
     template <unsigned int m>

@@ -1,5 +1,5 @@
 #include "AaTimer"
-#ifndef WIN32
+#ifndef _WIN32
   #include <sys/time.h>
 #endif
 
@@ -7,7 +7,7 @@ namespace Aa
 {
   double Timer::getTime ()
   {
-#ifdef WIN32
+#ifdef _WIN32
     return 0.0;
 #else
     struct timeval time;
