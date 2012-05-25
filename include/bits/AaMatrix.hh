@@ -236,19 +236,19 @@ namespace Aa
 
   template <class T>
   AA_TOOLKIT_INLINE
-  M<T, 4, 4> Scale (const T & sx, const T & sy, const T & sz)
+  M<T, 4, 4> Scale (const V<T, 3> & s)
   {
-    return mat (vec<T> (sx, 0,  0,  0),
-                vec<T> (0,  sy, 0,  0),
-                vec<T> (0,  0, sz,  0),
-                vec<T> (0,  0,  0,  1));
+    return mat (vec<T> (s[0], 0,    0,     0),
+                vec<T> (0,    s[1], 0,     0),
+                vec<T> (0,    0,    s[2],  0),
+                vec<T> (0,    0,    0,     1));
   }
 
   template <class T>
   AA_TOOLKIT_INLINE
   M<T, 4, 4> Scale (const T & t)
   {
-    return Scale (t, t, t);
+    return Scale (V<T, 3> (t));
   }
 
 ////////////////////////////////////////////////////////////////////////////////
