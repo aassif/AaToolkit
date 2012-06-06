@@ -23,18 +23,23 @@
   #define cbrt(a) pow(abs((a)),1.0/3.0)
 #endif
 
-namespace Aa
-{
-#if 1 // __USE_MISC
-  typedef unsigned int   uint;
-  typedef unsigned short ushort;
-  typedef unsigned long  ulong;
-#endif
+typedef   signed char  AaByte;
+typedef unsigned char  AaUByte;
+typedef   signed int   AaInt;
+typedef unsigned int   AaUInt;
+typedef   signed short AaShort;
+typedef unsigned short AaUShort;
+typedef   signed long  AaLong;
+typedef unsigned long  AaULong;
+//typedef float          AaFloat;
+//typedef double         AaDouble;
 
-  typedef unsigned char  uint8;
-  typedef unsigned short uint16;
-  typedef unsigned long  uint32;
-}
+typedef   signed char  AaInt8;
+typedef unsigned char  AaUInt8;
+typedef   signed short AaInt16;
+typedef unsigned short AaUInt16;
+typedef   signed long  AaInt32;
+typedef unsigned long  AaUInt32;
 
 #endif // __AA_TOOLKIT__
 

@@ -13,30 +13,30 @@ namespace Aa
   class ColorType {};
 
   template <>
-  class ColorType<uint8>
+  class ColorType<AaUInt8>
   {
     public:
-      inline static uint8 Min () {return 0x00;}
-      inline static uint8 Max () {return 0xFF;}
-      inline static uint8 Bar (uint8 u8) {return Max () ^ u8;}
+      inline static AaUInt8 Min () {return 0x00;}
+      inline static AaUInt8 Max () {return 0xFF;}
+      inline static AaUInt8 Bar (AaUInt8 u8) {return Max () ^ u8;}
   };
 
   template <>
-  class ColorType<uint16>
+  class ColorType<AaUInt16>
   {
     public:
-      inline static uint16 Min () {return 0x0000;}
-      inline static uint16 Max () {return 0xFFFF;}
-      inline static uint16 Bar (uint16 u16) {return Max () ^ u16;}
+      inline static AaUInt16 Min () {return 0x0000;}
+      inline static AaUInt16 Max () {return 0xFFFF;}
+      inline static AaUInt16 Bar (AaUInt16 u16) {return Max () ^ u16;}
   };
 
   template <>
-  class ColorType<uint32>
+  class ColorType<AaUInt32>
   {
     public:
-      inline static uint32 Min () {return 0x00000000;}
-      inline static uint32 Max () {return 0xFFFFFFFF;}
-      inline static uint32 Bar (uint32 u32) {return Max () ^ u32;}
+      inline static AaUInt32 Min () {return 0x00000000;}
+      inline static AaUInt32 Max () {return 0xFFFFFFFF;}
+      inline static AaUInt32 Bar (AaUInt32 u32) {return Max () ^ u32;}
   };
 
   template <>
@@ -79,20 +79,20 @@ class id\
   AA_DEFINE_COLOR (CMYK,  4)
   AA_DEFINE_COLOR (Mono,  1)
 
-  typedef RGB<uint8>    RGB8;
-  //typedef RGB<uint16>   RGB16;
-  typedef RGB<float>    RGBf;
-  typedef RGBA<uint8>   RGBA8;
-  //typedef RGBA<uint16>  RGBA16;
-  typedef RGBA<float>   RGBAf;
-  typedef HSV<uint8>    HSV8;
-  typedef HSV<float>    HSVf;
-  typedef CMY<uint8>    CMY8;
-  typedef CMYK<uint8>   CMYK8;
-  typedef YCbCr<uint8>  YCbCr8;
-  //typedef YCbCr<uint16> YCbCr16;
-  typedef Mono<uint8>   Mono8;
-  typedef Mono<uint16>  Mono16;
+  typedef RGB<AaUInt8>    RGB8;
+  //typedef RGB<AaUInt16>   RGB16;
+  typedef RGB<float>      RGBf;
+  typedef RGBA<AaUInt8>   RGBA8;
+  //typedef RGBA<AaUInt16>  RGBA16;
+  typedef RGBA<float>     RGBAf;
+  typedef HSV<AaUInt8>    HSV8;
+  typedef HSV<float>      HSVf;
+  typedef CMY<AaUInt8>    CMY8;
+  typedef CMYK<AaUInt8>   CMYK8;
+  typedef YCbCr<AaUInt8>  YCbCr8;
+  //typedef YCbCr<AaUInt16> YCbCr16;
+  typedef Mono<AaUInt8>   Mono8;
+  typedef Mono<AaUInt16>  Mono16;
 
 ////////////////////////////////////////////////////////////////////////////////
 // RuntimeColor ////////////////////////////////////////////////////////////////
@@ -423,19 +423,19 @@ class id\
   class ColorConv<RGB8, YCbCr8>
   {
     private:
-      static uint8 Round (float f)
+      static AaUInt8 Round (float f)
       {
         if (f <=   0.0) return   0;
         if (f >= 255.0) return 255;
-        return static_cast<uint8> (f + 0.5);
+        return static_cast<AaUInt8> (f + 0.5);
       }
 
     public:
       YCbCr8::Pixel operator() (const RGB8::Pixel & rgb) const
       {
-        uint8 R = rgb [0];
-        uint8 G = rgb [1];
-        uint8 B = rgb [2];
+        AaUInt8 R = rgb [0];
+        AaUInt8 G = rgb [1];
+        AaUInt8 B = rgb [2];
         // JPEG Y'CbCr.
         return vec (Round ( 0.299f  * R +  0.587f  * G +  0.114f  * B),
                     Round (-0.1687f * R + -0.3313f * G +  0.5f    * B + 128.0f),
@@ -447,19 +447,19 @@ class id\
   class ColorConv<YCbCr8, RGB8>
   {
     private:
-      static uint8 Round (float f)
+      static AaUInt8 Round (float f)
       {
         if (f <=   0.0) return   0;
         if (f >= 255.0) return 255;
-        return static_cast<uint8> (f + 0.5);
+        return static_cast<AaUInt8> (f + 0.5);
       }
 
     public:
       RGB8::Pixel operator() (const YCbCr8::Pixel & ycc) const
       {
-        uint8 Y  = ycc [0];
-        float Cb = ycc [1] - 128.0f;
-        float Cr = ycc [2] - 128.0f;
+        AaUInt8 Y  = ycc [0];
+        float   Cb = ycc [1] - 128.0f;
+        float   Cr = ycc [2] - 128.0f;
         return vec (Round (Y                  +  1.402f   * Cr),
                     Round (Y + -0.34414f * Cb + -0.71414f * Cr),
                     Round (Y +  1.772f   * Cb));

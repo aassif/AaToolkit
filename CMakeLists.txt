@@ -20,6 +20,14 @@ set(PROJECT_HDR
   include/AaRatio
   include/AaTimer
   include/AaVector
+  include/AaMatrix
+  include/AaGeometry
+  include/AaColor
+  include/AaSmartPointer
+  include/AaBuffer
+  include/AaTable
+  include/AaSignal
+  include/AaImage
   include/AaXml
   include/bits/AaToolkit.h
   include/bits/AaException.h
@@ -29,6 +37,14 @@ set(PROJECT_HDR
   include/bits/AaRatio.h
   include/bits/AaTimer.h
   include/bits/AaVector.hh
+  include/bits/AaMatrix.hh
+  include/bits/AaGeometry.hh
+  include/bits/AaColor.hh
+  include/bits/AaSmartPointer.hh
+  include/bits/AaBuffer.hh
+  include/bits/AaTable.hh
+  include/bits/AaSignal.hh
+  include/bits/AaImage.hh
   include/bits/AaXml.h
 )
 
@@ -53,9 +69,6 @@ add_library(AaToolkit
 set_target_properties(
   AaToolkit
   PROPERTIES
-  #RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
-  #LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
-  #ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
   RUNTIME_OUTPUT_DIRECTORY_DEBUG   ${PROJECT_SOURCE_DIR}/bin/debug
   RUNTIME_OUTPUT_DIRECTORY_RELEASE ${PROJECT_SOURCE_DIR}/bin/release
   LIBRARY_OUTPUT_DIRECTORY_DEBUG   ${PROJECT_SOURCE_DIR}/lib/debug

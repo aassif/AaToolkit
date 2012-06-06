@@ -5,24 +5,6 @@
 
 namespace Aa
 {
-  namespace details
-  {
-    inline static
-    void CheckRange (unsigned int i,
-                     unsigned int d) throw (std::out_of_range)
-    {
-#ifdef AA_BUFFER_DEBUG
-      std::cout << "CheckRange (i = " << i << ", d = " << d << ")\n";
-#endif
-      if (i >= d)
-      {
-        std::ostringstream oss;
-        oss << "CheckRange: " << i << " n'appartient pas à l'intervalle [0, " << (d-1) << ']';
-        throw std::out_of_range (oss.str ());
-      }
-    }
-  }
-
   template <class T, class A = ADM<T> >
   class Buffer : protected SmartPointer<T, A>
   {

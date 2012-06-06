@@ -14,11 +14,11 @@ int main (int argc, char ** argv)
   dvec3 v1 = vec (1.0, 2.0, 3.0);
   cout << "v1 = " << v1 << endl;
 
-  dvec3 v2 = vec (4.0, 5.0, 6.0);
-  cout << "v2 = " << v2 << endl;
+  dvec3 v2 = v1 + 3; //vec (4.0, 5.0, 6.0);
+  cout << "v2 = v1 + 3 = " << v2 << endl;
 
-  dvec3 v3 = vec (7.0, 8.0, 9.0);
-  cout << "v3 = " << v3 << endl;
+  dvec3 v3 = 6 + v1; //vec (7.0, 8.0, 9.0);
+  cout << "v3 = 6 + v2 = " << v3 << endl;
 
   dmat4 m0;
   cout << "m0 = " << m0 << endl;
@@ -98,7 +98,7 @@ int main (int argc, char ** argv)
 
   try
   {
-    for (uint i = 0; i < 10; ++i) s1d [i] = i;
+    for (AaUInt i = 0; i < 10; ++i) s1d [i] = i;
   }
   catch (exception & e)
   {
@@ -112,7 +112,7 @@ int main (int argc, char ** argv)
 
   try
   {
-    for (uint i = 0; i < 10; ++i) i2d [vec (i, 0u)] = ivec3 (i);
+    for (AaUInt i = 0; i < 10; ++i) i2d [vec (i, 0u)] = ivec3 (i);
   }
   catch (exception & e)
   {
@@ -121,7 +121,7 @@ int main (int argc, char ** argv)
 
   try
   {
-    for (uint i = 0; i < 10; ++i) i2d [vec (0u, i)] = i;
+    for (AaUInt i = 0; i < 10; ++i) i2d [vec (0u, i)] = i;
   }
   catch (exception & e)
   {

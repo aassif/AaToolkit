@@ -26,7 +26,7 @@ namespace Aa
                          const V<unsigned int, 1> & d,
                          unsigned int accu)
     {
-      return d * accu + i;
+      return d[0] * accu + i[0];
     }
 
     template <unsigned int m>
@@ -49,7 +49,7 @@ namespace Aa
 #ifdef AA_TABLE_DEBUG
       std::cout << "CheckMultiRange<1> (i = " << i << ", d = " << d << ")\n";
 #endif
-      Aa::details::CheckRange (i, d);
+      Aa::details::CheckRange (i[0], d[0]);
     }
   }
 

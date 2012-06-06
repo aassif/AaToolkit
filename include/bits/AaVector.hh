@@ -10,6 +10,22 @@ namespace Aa
 // V<T, m> ou V<U, m> -- au mieux-disant.
 #define AA_VP(T, U, m) V<AA_PROMOTE(T, U), m>
 
+  namespace details
+  {
+    // Vérification d'un indice.
+    AA_TOOLKIT_INLINE
+    void CheckRange (unsigned int i, unsigned int m)
+      throw (std::out_of_range)
+    {
+      if (i >= m)
+      {
+        std::ostringstream oss;
+        oss << i << " n'est pas inclus dans l'intervalle [0, " << (m-1) << ']';
+        throw std::out_of_range (oss.str ());
+      }
+    }
+  }
+
 ////////////////////////////////////////////////////////////////////////////////
 // Vecteur multi-composantes. //////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -17,10 +33,6 @@ namespace Aa
   template <class T, unsigned int m>
   class V : public V<T, m-1>
   {
-    private:
-      // Vérification d'un indice.
-      inline static void CheckRange (unsigned int i) throw (std::out_of_range);
-
     public:
       // Type propre.
       typedef V<T, m>   Self;
@@ -42,13 +54,19 @@ namespace Aa
       inline /***/ T & operator[] (unsigned int) /***/ throw (std::out_of_range);
       inline const T & operator[] (unsigned int) const throw (std::out_of_range);
       // Addition.
-      inline Self & operator+= (const Self &);
-      inline Self   operator+  (const Self &) const;
+      template <class U> inline Self       & operator+= (const U &);
+      template <class U> inline AA_VP(T,U,m) operator+  (const U &) const;
+      // Addition membre à membre.
+      template <class U> inline Self       & operator+= (const V<U, m> &);
+      template <class U> inline AA_VP(T,U,m) operator+  (const V<U, m> &) const;
       // Soustraction.
-      inline Self & operator-= (const Self &);
-      inline Self   operator-  (const Self &) const;
+      template <class U> inline Self       & operator-= (const U &);
+      template <class U> inline AA_VP(T,U,m) operator-  (const U &) const;
+      // Soustraction membre à membre.
+      template <class U> inline Self       & operator-= (const V<U, m> &);
+      template <class U> inline AA_VP(T,U,m) operator-  (const V<U, m> &) const;
       // Négation.
-      inline Self   operator-  () const;
+      inline Self operator- () const;
       // Multiplication.
       template <class U> inline Self       & operator*= (const U &);
       template <class U> inline AA_VP(T,U,m) operator*  (const U &) const;
@@ -81,13 +99,26 @@ namespace Aa
       inline unsigned int max () const;
 
     public:
-      //inline static T Horner (const Self & i, const Self & d, const T & accu);
-
       inline static Self Min (const Self &, const Self &);
       inline static Self Max (const Self &, const Self &);
 
-      //inline static Self Id (unsigned int k);
+      template <class T2, unsigned int m2> friend class V;
   };
+
+#if 1
+  template <class T, class U, unsigned int m>
+  AA_TOOLKIT_INLINE
+  AA_VP(T,U,m) operator+ (const U & u, const V<T, m> & v)
+  {
+    return v + u;
+  }
+
+  template <class T, class U, unsigned int m>
+  AA_TOOLKIT_INLINE
+  AA_VP(T,U,m) operator- (const U & u, const V<T, m> & v)
+  {
+    return -v + u;
+  }
 
   template <class T, class U, unsigned int m>
   AA_TOOLKIT_INLINE
@@ -95,17 +126,7 @@ namespace Aa
   {
     return v * u;
   }
-
-  template <class T, unsigned int m>
-  void V<T, m>::CheckRange (unsigned int i) throw (std::out_of_range)
-  {
-    if (i >= m)
-    {
-      std::ostringstream oss;
-      oss << i << " n'est pas inclus dans l'intervalle [0, " << (m-1) << ']';
-      throw std::out_of_range (oss.str ());
-    }
-  }
+#endif
 
   template <class T, unsigned int m>
   V<T, m>::V (const T & t) : Parent (t), m_value (t) {}
@@ -115,48 +136,88 @@ namespace Aa
 
   template <class T, unsigned int m>
   template <class U>
-  V<T, m>::V (const V<U, m> & v) : Parent (v), m_value (static_cast<T> (v [m-1])) {}
+  V<T, m>::V (const V<U, m> & v) : Parent (v), m_value (static_cast<T> (v.m_value)) {}
 
   template <class T, unsigned int m>
   T & V<T, m>::operator[] (unsigned int i) throw (std::out_of_range)
   {
-    CheckRange (i);
-    return V<T, 1>::operator[] (i);
+    details::CheckRange (i, m);
+    return V<T, 1>::value (i);
   }
 
   template <class T, unsigned int m>
   const T & V<T, m>::operator[] (unsigned int i) const throw (std::out_of_range)
   {
-    CheckRange (i);
-    return V<T, 1>::operator[] (i);
+    details::CheckRange (i, m);
+    return V<T, 1>::value (i);
+  }
+
+#if 1
+  template <class T, unsigned int m>
+  template <class U>
+  V<T, m> & V<T, m>::operator+= (const U & u)
+  {
+    p ()    += u;
+    m_value += u;
+    return *this;
   }
 
   template <class T, unsigned int m>
-  V<T, m> & V<T, m>::operator+= (const V<T, m> & v)
+  template <class U>
+  AA_VP(T,U,m) V<T, m>::operator+ (const U & u) const
   {
-    p ()    += v;
+    return AA_VP(T,U,m) (p () + u, m_value + u);
+  }
+#endif
+
+  template <class T, unsigned int m>
+  template <class U>
+  V<T, m> & V<T, m>::operator+= (const V<U, m> & v)
+  {
+    p ()    += v.p ();
     m_value += v.m_value;
     return *this;
   }
 
   template <class T, unsigned int m>
-  V<T, m> V<T, m>::operator+ (const V<T, m> & v) const
+  template <class U>
+  AA_VP(T,U,m) V<T, m>::operator+ (const V<U, m> & v) const
   {
-    return V (p () + v.p (), m_value + v.m_value);
+    return AA_VP(T,U,m) (p () + v.p (), m_value + v.m_value);
+  }
+
+#if 1
+  template <class T, unsigned int m>
+  template <class U>
+  V<T, m> & V<T, m>::operator-= (const U & u)
+  {
+    p ()    -= u;
+    m_value -= u;
+    return *this;
   }
 
   template <class T, unsigned int m>
-  V<T, m> & V<T, m>::operator-= (const V<T, m> & v)
+  template <class U>
+  AA_VP(T,U,m) V<T, m>::operator- (const U & u) const
   {
-    p ()    -= v;
+    return AA_VP(T,U,m) (p () - u, m_value - u);
+  }
+#endif
+
+  template <class T, unsigned int m>
+  template <class U>
+  V<T, m> & V<T, m>::operator-= (const V<U, m> & v)
+  {
+    p ()    -= v.p ();
     m_value -= v.m_value;
     return *this;
   }
 
   template <class T, unsigned int m>
-  V<T, m> V<T, m>::operator- (const V<T, m> & v) const
+  template <class U>
+  AA_VP(T,U,m) V<T, m>::operator- (const V<U, m> & v) const
   {
-    return V (p () - v.p (), m_value - v.m_value);
+    return AA_VP(T,U,m) (p () - v.p (), m_value - v.m_value);
   }
 
   template <class T, unsigned int m>
@@ -165,6 +226,7 @@ namespace Aa
     return V (-p (), -m_value);
   }
 
+#if 1
   template <class T, unsigned int m>
   template <class U>
   V<T, m> & V<T, m>::operator*= (const U & u)
@@ -180,6 +242,7 @@ namespace Aa
   {
     return AA_VP(T,U,m) (p () * u, m_value * u);
   }
+#endif
 
   template <class T, unsigned int m>
   template <class U>
@@ -197,6 +260,7 @@ namespace Aa
     return AA_VP(T,U,m) (p () * v.p (), m_value * v.m_value);
   }
 
+#if 1
   template <class T, unsigned int m>
   template <class U>
   V<T, m> & V<T, m>::operator/= (const U & u) throw (div_by_zero)
@@ -212,8 +276,11 @@ namespace Aa
   template <class U>
   AA_VP(T,U,m) V<T, m>::operator/ (const U & u) const throw (div_by_zero)
   {
+    if (u == 0) throw div_by_zero ();
+
     return AA_VP(T,U,m) (p () / u, m_value / u);
   }
+#endif
 
   template <class T, unsigned int m>
   template <class U>
@@ -230,6 +297,8 @@ namespace Aa
   template <class U>
   AA_VP(T,U,m) V<T, m>::operator/ (const V<U, m> & v) const throw (div_by_zero)
   {
+    if (v.m_value == 0) throw div_by_zero ();
+
     return AA_VP(T,U,m) (p () / v.p (), m_value / v.m_value);
   }
 
@@ -313,14 +382,6 @@ namespace Aa
     return (m_value > (*this) [k]) ? m-1 : k;
   }
 
-#if 0
-  template <class T, unsigned int m>
-  T V<T, m>::Horner (const V<T, m> & i, const V<T, m> & d, const T & accu)
-  {
-    return Parent::Horner (i, d, accu * d [m-1] + i [m-1]);
-  }
-#endif
-
   template <class T, unsigned int m>
   V<T, m> V<T, m>::Min (const V<T, m> & v1, const V<T, m> & v2)
   {
@@ -332,14 +393,6 @@ namespace Aa
   {
     return V<T, m> (Parent::Max (v1, v2), v1.m_value < v2.m_value ? v2.m_value : v1.m_value);
   }
-
-#if 0
-  template <class T, unsigned int m>
-  V<T, m> V<T, m>::Id (unsigned int k)
-  {
-    return V<T, m> (Parent::Id (k), k == m-1 ? 1 : 0);
-  }
-#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // Vecteur mono-composante. ////////////////////////////////////////////////////
@@ -356,15 +409,50 @@ namespace Aa
       T m_value;
 
     protected:
-      inline /***/ T & operator[] (unsigned int i) /***/ {return (&m_value) [i];}
-      inline const T & operator[] (unsigned int i) const {return (&m_value) [i];}
+      inline /***/ T & value (unsigned int i) /***/ {return (&m_value) [i];}
+      inline const T & value (unsigned int i) const {return (&m_value) [i];}
 
     public:
       // Constructeurs.
       inline V (const T & t = T ()) : m_value (t) {}
-      // Accès à la donnée.
-      inline operator /***/ T & () /***/ {return m_value;}
-      inline operator const T & () const {return m_value;}
+      template <class U>
+      inline /* explicit */ V (const V<U, 1> &);
+      // Accès aux données.
+      inline /***/ T & operator[] (unsigned int) /***/ throw (std::out_of_range);
+      inline const T & operator[] (unsigned int) const throw (std::out_of_range);
+      // Addition.
+      template <class U> inline Self       & operator+= (const U &);
+      template <class U> inline AA_VP(T,U,1) operator+  (const U &) const;
+      // Addition membre à membre.
+      template <class U> inline Self       & operator+= (const V<U, 1> &);
+      template <class U> inline AA_VP(T,U,1) operator+  (const V<U, 1> &) const;
+      // Soustraction.
+      template <class U> inline Self       & operator-= (const U &);
+      template <class U> inline AA_VP(T,U,1) operator-  (const U &) const;
+      // Soustraction membre à membre.
+      template <class U> inline Self       & operator-= (const V<U, 1> &);
+      template <class U> inline AA_VP(T,U,1) operator-  (const V<U, 1> &) const;
+      // Négation.
+      inline Self operator- () const;
+      // Multiplication.
+      template <class U> inline Self       & operator*= (const U &);
+      template <class U> inline AA_VP(T,U,1) operator*  (const U &) const;
+      // Multiplication membre à membre.
+      template <class U> inline Self       & operator*= (const V<U, 1> &);
+      template <class U> inline AA_VP(T,U,1) operator*  (const V<U, 1> &) const;
+      // Division.
+      template <class U> inline Self       & operator/= (const U &) /***/ throw (div_by_zero);
+      template <class U> inline AA_VP(T,U,1) operator/  (const U &) const throw (div_by_zero);
+      // Division membre à membre.
+      template <class U> inline Self       & operator/= (const V<U, 1> &) /***/ throw (div_by_zero);
+      template <class U> inline AA_VP(T,U,1) operator/  (const V<U, 1> &) const throw (div_by_zero);
+      // Comparaison.
+      inline bool operator== (const Self &) const;
+      inline bool operator!= (const Self &) const;
+      inline bool operator<  (const Self &) const;
+      inline bool operator<= (const Self &) const;
+      inline bool operator>  (const Self &) const;
+      inline bool operator>= (const Self &) const;
       // Somme et produit.
       inline T sum  () const {return m_value;}
       inline T prod () const {return m_value;}
@@ -373,21 +461,210 @@ namespace Aa
       inline unsigned int max () const {return 0;}
 
     public:
-      //inline static T Horner (const Self & i, const Self & d, const T & accu);
-
       inline static Self Min (const Self &, const Self &);
       inline static Self Max (const Self &, const Self &);
 
-      //inline static Self Id (unsigned int);
+      template <class T2, unsigned int m2> friend class V;
   };
 
-#if 0
   template <class T>
-  T V<T, 1>::Horner (const V<T, 1> & i, const V<T, 1> & d, const T & accu)
+  template <class U>
+  V<T, 1>::V (const V<U, 1> & v) :
+    m_value (static_cast<T> (v [0]))
   {
-    return accu * d + i;
+  }
+
+  template <class T>
+  T & V<T, 1>::operator[] (unsigned int i) throw (std::out_of_range)
+  {
+    details::CheckRange (i, 1);
+    return m_value;
+  }
+
+  template <class T>
+  const T & V<T, 1>::operator[] (unsigned int i) const throw (std::out_of_range)
+  {
+    details::CheckRange (i, 1);
+    return m_value;
+  }
+
+#if 1
+  template <class T>
+  template <class U>
+  V<T, 1> & V<T, 1>::operator+= (const U & u)
+  {
+    m_value += u;
+    return *this;
+  }
+
+  template <class T>
+  template <class U>
+  AA_VP(T,U,1) V<T, 1>::operator+ (const U & u) const
+  {
+    return AA_VP(T,U,1) (m_value + u);
   }
 #endif
+
+  template <class T>
+  template <class U>
+  V<T, 1> & V<T, 1>::operator+= (const V<U, 1> & v)
+  {
+    m_value += v.m_value;
+    return *this;
+  }
+
+  template <class T>
+  template <class U>
+  AA_VP(T,U,1) V<T, 1>::operator+ (const V<U, 1> & v) const
+  {
+    return AA_VP(T,U,1) (m_value + v.m_value);
+  }
+
+#if 1
+  template <class T>
+  template <class U>
+  V<T, 1> & V<T, 1>::operator-= (const U & u)
+  {
+    m_value -= u;
+    return *this;
+  }
+
+  template <class T>
+  template <class U>
+  AA_VP(T,U,1) V<T, 1>::operator- (const U & u) const
+  {
+    return AA_VP(T,U,1) (m_value - u);
+  }
+#endif
+
+  template <class T>
+  template <class U>
+  V<T, 1> & V<T, 1>::operator-= (const V<U, 1> & v)
+  {
+    m_value -= v.m_value;
+    return *this;
+  }
+
+  template <class T>
+  template <class U>
+  AA_VP(T,U,1) V<T, 1>::operator- (const V<U, 1> & v) const
+  {
+    return AA_VP(T,U,1) (m_value - v.m_value);
+  }
+
+  template <class T>
+  V<T, 1> V<T, 1>::operator- () const
+  {
+    return V (-m_value);
+  }
+
+#if 1
+  template <class T>
+  template <class U>
+  V<T, 1> & V<T, 1>::operator*= (const U & u)
+  {
+    m_value *= u;
+    return *this;
+  }
+
+  template <class T>
+  template <class U>
+  AA_VP(T,U,1) V<T, 1>::operator* (const U & u) const
+  {
+    return AA_VP(T,U,1) (m_value * u);
+  }
+#endif
+
+  template <class T>
+  template <class U>
+  V<T, 1> & V<T, 1>::operator*= (const V<U, 1> & v)
+  {
+    m_value *= v.m_value;
+    return *this;
+  }
+
+  template <class T>
+  template <class U>
+  AA_VP(T,U,1) V<T, 1>::operator* (const V<U, 1> & v) const
+  {
+    return AA_VP(T,U,1) (m_value * v.m_value);
+  }
+
+#if 1
+  template <class T>
+  template <class U>
+  V<T, 1> & V<T, 1>::operator/= (const U & u) throw (div_by_zero)
+  {
+    if (u == 0) throw div_by_zero ();
+
+    m_value /= u;
+    return *this;
+  }
+
+  template <class T>
+  template <class U>
+  AA_VP(T,U,1) V<T, 1>::operator/ (const U & u) const throw (div_by_zero)
+  {
+    if (u == 0) throw div_by_zero ();
+
+    return AA_VP(T,U,1) (m_value / u);
+  }
+#endif
+
+  template <class T>
+  template <class U>
+  V<T, 1> & V<T, 1>::operator/= (const V<U, 1> & v) throw (div_by_zero)
+  {
+    if (v.m_value == 0) throw div_by_zero ();
+
+    m_value /= v.m_value;
+    return *this;
+  }
+
+  template <class T>
+  template <class U>
+  AA_VP(T,U,1) V<T, 1>::operator/ (const V<U, 1> & v) const throw (div_by_zero)
+  {
+    if (v.m_value == 0) throw div_by_zero ();
+
+    return AA_VP(T,U,1) (m_value / v.m_value);
+  }
+
+  template <class T>
+  bool V<T, 1>::operator== (const V<T, 1> & v) const
+  {
+    return m_value == v.m_value;
+  }
+
+  template <class T>
+  bool V<T, 1>::operator!= (const V<T, 1> & v) const
+  {
+    return m_value != v.m_value;
+  }
+
+  template <class T>
+  bool V<T, 1>::operator< (const V<T, 1> & v) const
+  {
+    return m_value < v.m_value;
+  }
+
+  template <class T>
+  bool V<T, 1>::operator<= (const V<T, 1> & v) const
+  {
+    return m_value <= v.m_value;
+  }
+
+  template <class T>
+  bool V<T, 1>::operator> (const V<T, 1> & v) const
+  {
+    return m_value > v.m_value;
+  }
+
+  template <class T>
+  bool V<T, 1>::operator>= (const V<T, 1> & v) const
+  {
+    return m_value >= v.m_value;
+  }
 
   template <class T>
   V<T, 1> V<T, 1>::Min (const V<T, 1> & v1, const V<T, 1> & v2)
@@ -400,14 +677,6 @@ namespace Aa
   {
     return v1 < v2 ? v2 : v1;
   }
-
-#if 0
-  template <class T>
-  V<T, 1> V<T, 1>::Id (unsigned int k)
-  {
-    return V<T, 1> (k == 0 ? 1 : 0);
-  }
-#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // Raccourcis. /////////////////////////////////////////////////////////////////
@@ -457,9 +726,9 @@ namespace Aa
   typedef V<int,    3> ivec3;
   typedef V<int,    4> ivec4;
 
-  typedef V<uint,   2> uvec2;
-  typedef V<uint,   3> uvec3;
-  typedef V<uint,   4> uvec4;
+  typedef V<AaUInt, 2> uvec2;
+  typedef V<AaUInt, 3> uvec3;
+  typedef V<AaUInt, 4> uvec4;
 
   typedef V<bool,   2> bvec2;
   typedef V<bool,   3> bvec3;
@@ -537,6 +806,18 @@ namespace Aa
                      << v[2] << ", "
                      << v[3] << '}';
   }
+
+////////////////////////////////////////////////////////////////////////////////
+// Promotion. //////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+#if 0
+  template <class T, class U, unsigned int m>
+  struct Promote<V<T, m>, U> {typedef AA_VP(T,U,m) Type;};
+
+  template <class T, class U, unsigned int m>
+  struct Promote<V<T, m>, V<U, m> > {typedef AA_VP(T,U,m) Type;};
+#endif
 
 } // namespace Aa
 
