@@ -1,60 +1,58 @@
 #ifndef __AA_COLOR__
 #define __AA_COLOR__
 
-//#include <PaniniVector.hh>
-
 namespace Aa
 {
 ////////////////////////////////////////////////////////////////////////////////
-// ColorType<T> ////////////////////////////////////////////////////////////////
+// ColorMath<T> ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
   template <class T>
-  class ColorType {};
+  class ColorMath {};
 
   template <>
-  class ColorType<AaUInt8>
+  class ColorMath<AaUInt8>
   {
     public:
       inline static AaUInt8 Min () {return 0x00;}
       inline static AaUInt8 Max () {return 0xFF;}
-      inline static AaUInt8 Bar (AaUInt8 u8) {return Max () ^ u8;}
+      inline static AaUInt8 Not (AaUInt8 u8) {return Max () ^ u8;}
   };
 
   template <>
-  class ColorType<AaUInt16>
+  class ColorMath<AaUInt16>
   {
     public:
       inline static AaUInt16 Min () {return 0x0000;}
       inline static AaUInt16 Max () {return 0xFFFF;}
-      inline static AaUInt16 Bar (AaUInt16 u16) {return Max () ^ u16;}
+      inline static AaUInt16 Not (AaUInt16 u16) {return Max () ^ u16;}
   };
 
   template <>
-  class ColorType<AaUInt32>
+  class ColorMath<AaUInt32>
   {
     public:
       inline static AaUInt32 Min () {return 0x00000000;}
       inline static AaUInt32 Max () {return 0xFFFFFFFF;}
-      inline static AaUInt32 Bar (AaUInt32 u32) {return Max () ^ u32;}
+      inline static AaUInt32 Not (AaUInt32 u32) {return Max () ^ u32;}
   };
 
   template <>
-  class ColorType<float>
+  class ColorMath<float>
   {
     public:
       inline static float Min () {return 0.0f;}
       inline static float Max () {return 1.0f;}
-      inline static float Bar (float f) {return Max () - f;}
+      inline static float Not (float f) {return Max () - f;}
   };
 
   template <>
-  class ColorType<double>
+  class ColorMath<double>
   {
     public:
       inline static double Min () {return 0.0;}
       inline static double Max () {return 1.0;}
-      inline static double Bar (double d) {return Max () - d;}
+      inline static double Not (double d) {return Max () - d;}
   };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -116,7 +114,7 @@ class id\
     RUNTIME_YCbCr8  = 13,
     //RUNTIME_YCbCr16 = 14,
     //RUNTIME_YCbCrf  = 15,
-    //RUNTIME_YCbCrd  = 16
+    //RUNTIME_YCbCrd  = 16,
     RUNTIME_ERROR   = 17
   }
   RuntimeEnum;
@@ -238,7 +236,7 @@ class id\
         unsigned int min = rgb.min ();
         unsigned int max = rgb.max ();
 
-        float m = rgb [max];
+        float m =     rgb [max];
         float d = m - rgb [min];
 
         if (d > 0.0f) return vec (hue (rgb, max, d) / 6.0f, d / m, m);
@@ -254,9 +252,28 @@ class id\
       typedef RGBf::Pixel DstPixel;
 
     public:
-      DstPixel operator() (const SrcPixel &) const
+      DstPixel operator() (const SrcPixel & hsv) const
       {
-        return DstPixel (); // TODO
+        float h = hsv [0];
+        float s = hsv [1];
+        float v = hsv [2];
+
+        float i, f = std::modf (h * 6.0, &i);
+
+        float l = v * (1.0f - s);
+        float m = v * (1.0f - f * s);
+        float n = v * (1.0f - (1.0f - f) * s);
+
+        switch ((int) std::floor (i))
+        {
+          default:
+          case  0: return vec (v, n, l);
+          case  1: return vec (m, v, l);
+          case  2: return vec (l, v, n);
+          case  3: return vec (l, m, v);
+          case  4: return vec (n, l, v);
+          case  5: return vec (v, l, m);
+        }
       }
   };
 
@@ -274,9 +291,9 @@ class id\
     public:
       DstPixel operator() (const SrcPixel & rgb) const
       {
-        T c = ColorType<T>::Bar (rgb [0]);
-        T m = ColorType<T>::Bar (rgb [1]);
-        T y = ColorType<T>::Bar (rgb [2]);
+        T c = ColorMath<T>::Not (rgb [0]);
+        T m = ColorMath<T>::Not (rgb [1]);
+        T y = ColorMath<T>::Not (rgb [2]);
         return vec<T> (c, m, y);
       }
   };
@@ -291,9 +308,9 @@ class id\
     public:
       DstPixel operator() (const SrcPixel & cmy) const
       {
-        T r = ColorType<T>::Bar (cmy [0]);
-        T g = ColorType<T>::Bar (cmy [0]);
-        T b = ColorType<T>::Bar (cmy [0]);
+        T r = ColorMath<T>::Not (cmy [0]);
+        T g = ColorMath<T>::Not (cmy [0]);
+        T b = ColorMath<T>::Not (cmy [0]);
         return vec<T> (r, g, b);
       }
   };
@@ -346,8 +363,10 @@ class id\
     public ColorConv3 < RGB<T>, CMY<T>, CMYK<T> >
   {
     public:
+#if 0
       typedef typename RGB <T>::Pixel SrcPixel;
       typedef typename CMYK<T>::Pixel DstPixel;
+#endif
 
     public:
 #if 0
@@ -365,8 +384,10 @@ class id\
     public ColorConv3 < CMYK<T>, CMY<T>, RGB<T> >
   {
     public:
+#if 0
       typedef typename CMYK<T>::Pixel SrcPixel;
       typedef typename RGB <T>::Pixel DstPixel;
+#endif
 
     public:
 #if 0
