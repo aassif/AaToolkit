@@ -15,11 +15,15 @@ namespace Aa
   /** Printable characters are surrounded by single quotes.
       Others are translated into an hex string, preceded by a backslash.
       Every generated string is 3 char long. */
+
+  AA_TOOLKIT_API
   std::string printable (unsigned char c /** the character */) throw ();
 
   /// Translate a string into a printable string.
   /** Non-empty strings are surrounded by double quotes.
       Empty strings give the "(null)" string. */
+
+  AA_TOOLKIT_API
   std::string printable (const std::string & s /** the string */) throw ();
 
   /// Exception thrown when a file cannot be opened.

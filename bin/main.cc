@@ -2,6 +2,7 @@
 //#define AA_TABLE_DEBUG
 //#define AA_SIGNAL_DEBUG
 
+#include <AaCmdLine>
 #include <AaMatrix>
 #include <AaImage>
 
@@ -10,6 +11,9 @@ using namespace Aa;
 
 int main (int argc, char ** argv)
 {
+  CmdLine::Parser p ("main");
+  p (argc, argv);
+
 #if 1
   dvec3 v1 = vec (1.0, 2.0, 3.0);
   cout << "v1 = " << v1 << endl;
