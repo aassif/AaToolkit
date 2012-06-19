@@ -158,7 +158,7 @@ namespace Aa
   V<T, m> & V<T, m>::operator+= (const U & u)
   {
     p ()    += u;
-    m_value += u;
+    m_value += u[m-1];
     return *this;
   }
 
@@ -493,7 +493,7 @@ namespace Aa
   template <class U>
   V<T, 1> & V<T, 1>::operator+= (const U & u)
   {
-    m_value += u;
+    m_value += u[0];
     return *this;
   }
 
