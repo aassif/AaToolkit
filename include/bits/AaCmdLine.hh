@@ -158,8 +158,8 @@ namespace Aa
     AA_DECLARE_TYPEID (double,        "<double>")
     AA_DECLARE_TYPEID (std::string,   "<string>")
 
-    template <> void StringParser::operator() (const std::string & str, bool        * target) throw (ParseError);
-    template <> void StringParser::operator() (const std::string & str, std::string * target) throw (ParseError);
+    template <> inline void StringParser::operator() (const std::string & str, bool        * target) throw (ParseError);
+    template <> inline void StringParser::operator() (const std::string & str, std::string * target) throw (ParseError);
 
     /* Parser */
 
@@ -304,6 +304,7 @@ namespace Aa
 
     protected:
       /// Constructor.
+      inline
       AbstractOption (Parser * parser,
                       char shortKey,
                       const std::string & longKey,
@@ -322,7 +323,7 @@ namespace Aa
 
     public:
       /// Destructor.
-      virtual ~AbstractOption ();
+      inline virtual ~AbstractOption ();
       /// Returns the short name of the option.
       inline char getShort () const {return m_shortKey;}
       /// Returns the long name of the option.
@@ -650,6 +651,7 @@ namespace Aa
 ////////////////////////////////////////////////////////////////////////////////
 
     template <>
+    inline
     void StringParser::operator() (const std::string & str, bool * target) throw (ParseError)
     {
       std::istringstream i (str); std::string s; i >> s >> std::ws;
@@ -660,6 +662,7 @@ namespace Aa
     }
 
     template <>
+    inline
     void StringParser::operator() (const std::string & str, std::string * target) throw (ParseError)
     {
       (*target) = str;
@@ -670,8 +673,11 @@ namespace Aa
 ////////////////////////////////////////////////////////////////////////////////
 
     template <>
-    StringList::iterator MultipleOption<bool>::parse (StringList::iterator first, StringList::iterator last)
-      throw (NotEnoughValues, ParseError)
+    inline
+    StringList::iterator
+      MultipleOption<bool>::parse (StringList::iterator first,
+                                   StringList::iterator last)
+        throw (NotEnoughValues, ParseError)
     {
       m_used = true;
       if (m_num == 0)
