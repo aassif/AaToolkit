@@ -135,9 +135,9 @@ namespace Aa
       }
 
       inline
-      V<Row, m> transpose () const
+      M<T, n, m> transpose () const
       {
-        V<Row, m> matrix;
+        M<T, n, m> matrix;
 
         for (unsigned int r = 0; r < m; ++r)
           matrix [r] = this->row (r);
@@ -212,12 +212,12 @@ namespace Aa
 
   template <class T>
   AA_TOOLKIT_INLINE
-  M<T, 4, 4> Translation (const T & tx, const T & ty, const T & tz)
+  M<T, 4, 4> Translation (const V<T, 3> & t)
   {
-    return mat (vec<T> (0,  0,  0,  0),
-                vec<T> (0,  0,  0,  0),
-                vec<T> (0,  0,  0,  0),
-                vec<T> (tx, ty, tz, 1));
+    return mat (vec<T> (1,    0,    0,    0),
+                vec<T> (0,    1,    0,    0),
+                vec<T> (0,    0,    1,    0),
+                vec<T> (t[0], t[1], t[2], 1));
   }
 
   template <class T>

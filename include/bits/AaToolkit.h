@@ -3,7 +3,7 @@
 
 #define AA_TOOLKIT_INLINE inline
 
-#if defined( _WIN32 ) && defined( AA_TOOLKIT_BUILD_SHARED )
+#if defined (_WIN32) && defined (AA_TOOLKIT_BUILD_SHARED)
   #ifdef AaToolkit_EXPORTS // Merci CMake :)
     #define AA_TOOLKIT_API    __declspec(dllexport)
     #define AA_TOOLKIT_EXTERN

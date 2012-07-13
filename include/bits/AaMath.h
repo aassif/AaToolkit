@@ -429,11 +429,7 @@ namespace Aa
     template <class T, unsigned int m>
     void Box<T, m>::write (std::ostream & o) const
     {
-      o << '{'
-        << m_pos.x << ", " << m_pos.y << ", " << m_pos.z
-        << ", "
-        << m_dim.x << ", " << m_dim.y << ", " << m_dim.z
-        << '}';
+      o << '{' << m_pos << ", " << m_dim << '}';
     }
 
     template <class T, unsigned int m>
