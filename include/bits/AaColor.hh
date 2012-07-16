@@ -258,7 +258,7 @@ class id\
         float s = hsv [1];
         float v = hsv [2];
 
-        float i, f = std::modf (h * 6.0, &i);
+        float i, f = std::modf (h * 6.0f, &i);
 
         float l = v * (1.0f - s);
         float m = v * (1.0f - f * s);
