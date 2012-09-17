@@ -1,38 +1,22 @@
-#ifndef __AA_TABLE__
-#define __AA_TABLE__
+#ifndef AA_TABLE__H
+#define AA_TABLE__H
 
 #include <sstream>
 
 namespace Aa
 {
+
 ////////////////////////////////////////////////////////////////////////////////
-// CheckMultiRange /////////////////////////////////////////////////////////////
+// CheckMultiRange<m> //////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
   namespace details
   {
-    template <unsigned int m>
+    template <AaUInt m>
     inline
-    unsigned int Horner (const V<unsigned int, m> & i,
-                         const V<unsigned int, m> & d,
-                         unsigned int accu)
-    {
-      return Aa::details::Horner<m-1> (i, d, accu * d[m-1] + i[m-1]);
-    }
-
-    template <>
-    inline
-    unsigned int Horner (const V<unsigned int, 1> & i,
-                         const V<unsigned int, 1> & d,
-                         unsigned int accu)
-    {
-      return d[0] * accu + i[0];
-    }
-
-    template <unsigned int m>
-    inline
-    void CheckMultiRange (const V<unsigned int, m> & i,
-                          const V<unsigned int, m> & d) throw (std::out_of_range)
+    void CheckMultiRange (const V<AaUInt, m> & i,
+                          const V<AaUInt, m> & d)
+      throw (std::out_of_range)
     {
 #ifdef AA_TABLE_DEBUG
       std::cout << "CheckMultiRange<" << m << "> (i = " << i << ", d = " << d << ")\n";
@@ -43,8 +27,9 @@ namespace Aa
 
     template <>
     inline
-    void CheckMultiRange (const V<unsigned int, 1> & i,
-                          const V<unsigned int, 1> & d) throw (std::out_of_range)
+    void CheckMultiRange (const V<AaUInt, 1> & i,
+                          const V<AaUInt, 1> & d)
+      throw (std::out_of_range)
     {
 #ifdef AA_TABLE_DEBUG
       std::cout << "CheckMultiRange<1> (i = " << i << ", d = " << d << ")\n";
@@ -54,31 +39,95 @@ namespace Aa
   }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Flatten<m> //////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  namespace details
+  {
+    template <AaUInt m>
+    inline
+    AaUInt Flatten (const V<AaUInt, m> & i,
+                    const V<AaUInt, m> & d,
+                    AaUInt accu)
+    {
+      return Aa::details::Flatten<m-1> (i, d, accu * d[m-1] + i[m-1]);
+    }
+
+    template <>
+    inline
+    AaUInt Flatten (const V<AaUInt, 1> & i,
+                    const V<AaUInt, 1> & d,
+                    AaUInt accu)
+    {
+      return d[0] * accu + i[0];
+    }
+  }
+
+  template <AaUInt m>
+  inline
+  AaUInt Flatten (const V<AaUInt, m> & i,
+                  const V<AaUInt, m> & d)
+  {
+    return Aa::details::Flatten<m> (i, d, 0u);
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+// Unflatten<m> ////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  namespace details
+  {
+    template <AaUInt m>
+    inline
+    std::pair<V<AaUInt, m>, AaUInt> Unflatten (AaUInt k, const V<AaUInt, m> & d)
+    {
+      std::pair<V<AaUInt, m-1>, AaUInt> p = Unflatten<m-1> (k, d);
+      return std::make_pair (V<AaUInt, m> (p.first, p.second % d[m-1]), p.second / d[m-1]);
+    }
+
+    template <>
+    inline
+    std::pair<V<AaUInt, 1>, AaUInt> Unflatten (AaUInt k, const V<AaUInt, 1> & d)
+    {
+      return std::make_pair (V<AaUInt, 1> (k % d[0]), k / d[0]);
+    }
+  }
+
+  template <AaUInt m>
+  inline
+  V<AaUInt, m> Unflatten (AaUInt k, const V<AaUInt, m> & d)
+    throw (std::out_of_range)
+  {
+    details::CheckRange (k, d.prod ());
+    return details::Unflatten<m> (k, d).first;
+  }
+
+////////////////////////////////////////////////////////////////////////////////
 // Table<n, T, A> //////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  template <unsigned int n, class T, class A = ADM<T> >
+  template <AaUInt n, class T, class A = ADM<T> >
   class Table : public Buffer<T, A>
   {
     protected:
-      V<unsigned int, n> m_dims;
+      V<AaUInt, n> m_dims;
 
     public:
-      Table (const V<unsigned int, n> & d) throw (std::bad_alloc);
+      Table (const V<AaUInt, n> & d) throw (std::bad_alloc);
       // Gestion du buffer.
-      inline void alloc (unsigned int);
-      inline void alloc (const V<unsigned int, n> & d);
+      inline void alloc (AaUInt);
+      inline void alloc (const V<AaUInt, n> & d);
       inline void disconnect ();
       // Dimensions.
-      inline V<unsigned int, n> dims () const {return m_dims;}
-      inline unsigned int dim (unsigned int k) const {return m_dims [k];}
+      inline V<AaUInt, n> dims () const {return m_dims;}
+      inline AaUInt dim (AaUInt k) const {return m_dims [k];}
       // Accès à un élément.
-      inline /***/ T & operator[] (const V<unsigned int, n> &) /***/ throw (std::out_of_range);
-      inline const T & operator[] (const V<unsigned int, n> &) const throw (std::out_of_range);
+      inline /***/ T & operator[] (const V<AaUInt, n> &) /***/ throw (std::out_of_range);
+      inline const T & operator[] (const V<AaUInt, n> &) const throw (std::out_of_range);
   };
 
-  template <unsigned int n, class T, class A>
-  Table<n, T, A>::Table (const V<unsigned int, n> & d) throw (std::bad_alloc) :
+  template <AaUInt n, class T, class A>
+  Table<n, T, A>::Table (const V<AaUInt, n> & d) throw (std::bad_alloc) :
     Buffer<T, A> (),
     m_dims (0u)
   {
@@ -88,17 +137,17 @@ namespace Aa
     alloc (d);
   }
 
-  template <unsigned int n, class T, class A>
-  void Table<n, T, A>::alloc (unsigned int d)
+  template <AaUInt n, class T, class A>
+  void Table<n, T, A>::alloc (AaUInt d)
   {
 #ifdef AA_TABLE_DEBUG
     std::cout << this << " Table<" << n << ">::alloc (d = " << d << ")\n";
 #endif
-    alloc (V<unsigned int, n> (d));
+    alloc (V<AaUInt, n> (d));
   }
 
-  template <unsigned int n, class T, class A>
-  void Table<n, T, A>::alloc (const V<unsigned int, n> & d)
+  template <AaUInt n, class T, class A>
+  void Table<n, T, A>::alloc (const V<AaUInt, n> & d)
   {
 #ifdef AA_TABLE_DEBUG
     std::cout << this << " Table<" << n << ">::alloc (d = " << d << ")\n";
@@ -107,44 +156,44 @@ namespace Aa
     m_dims = d;
   }
 
-  template <unsigned int n, class T, class A>
+  template <AaUInt n, class T, class A>
   void Table<n, T, A>::disconnect ()
   {
 #ifdef AA_TABLE_DEBUG
     std::cout << this << " Table<" << n << ">::disconnect ()\n";
 #endif
     Buffer<T, A>::disconnect ();
-    m_dims = V<unsigned int, n> (0);
+    m_dims = V<AaUInt, n> (0u);
   }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Accès à un élément. /////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  template <unsigned int n, class T, class A>
-  T & Table<n, T, A>::operator[] (const V<unsigned int, n> & i)
+  template <AaUInt n, class T, class A>
+  T & Table<n, T, A>::operator[] (const V<AaUInt, n> & i)
     throw (std::out_of_range)
   {
 #ifdef AA_TABLE_DEBUG
     std::cout << this << " Table<" << n << ">::operator[] (i = " << i << ")\n";
 #endif
     details::CheckMultiRange (i, m_dims);
-    unsigned int h = details::Horner (i, m_dims, 0);
-    return this->begin () [h];
+    AaUInt f = Flatten (i, m_dims);
+    return this->begin () [f];
   }
 
-  template <unsigned int n, class T, class A>
-  const T & Table<n, T, A>::operator[] (const V<unsigned int, n> & i) const
+  template <AaUInt n, class T, class A>
+  const T & Table<n, T, A>::operator[] (const V<AaUInt, n> & i) const
     throw (std::out_of_range)
   {
 #ifdef AA_TABLE_DEBUG
     std::cout << this << " Table<" << n << ">::operator[] (i = " << i << ")\n";
 #endif
     details::CheckMultiRange (i, m_dims);
-    unsigned int h = details::Horner (i, m_dims, 0);
-    return this->begin () [h];
+    AaUInt f = Flatten (i, m_dims);
+    return this->begin () [f];
   }
 }
 
-#endif // __AA_TABLE__
+#endif // AA_TABLE__H
 

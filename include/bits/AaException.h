@@ -48,28 +48,28 @@ namespace Aa
 
   public:
     /// Constructor designed for unexpected end-of-file.
-    static ParseError Value (unsigned char expected /** the expected character */);
+    static ParseError Value (unsigned char expected /** the expected value */);
 
     /// Constructor designed for unexpected characters.
-    static ParseError Value (unsigned char expected /** the expected character */,
-                             unsigned char received /** the received character */);
+    static ParseError Value (unsigned char expected /** the expected value */,
+                             unsigned char received /** the received char */);
 
     /// Constructor designed for unexpected end-of-file.
-    static ParseError Value (const std::string & expected /** the expected string */);
+    static ParseError Value (const std::string & expected /** the expected value */);
 
     /// Constructor designed for unexpected strings.
-    static ParseError Value (const std::string & expected /** the expected string */,
+    static ParseError Value (const std::string & expected /** the expected value */,
                              const std::string & received /** the received string */);
 
     /// Constructor designed for unexpected end-of-file.
-    static ParseError Type  (const std::string & expected /** the expected string */);
+    static ParseError Type  (const std::string & expected /** the expected type */);
 
     /// Constructor designed for unexpected characters.
-    static ParseError Type  (const std::string & expected /** the expected string */,
-                             unsigned char       received /** the received string */);
+    static ParseError Type  (const std::string & expected /** the expected type */,
+                             unsigned char       received /** the received char */);
 
     /// Constructor designed for unexpected strings.
-    static ParseError Type  (const std::string & expected /** the expected string */,
+    static ParseError Type  (const std::string & expected /** the expected type */,
                              const std::string & received /** the received string */);
 
   public:
@@ -83,24 +83,6 @@ namespace Aa
     /// Destructor.
     ~ParseError () throw ();
   };
-
-#if 0
-  /// Exception thrown when a string could not be translated into another type.
-  class AA_TOOLKIT_API FormatError : public std::invalid_argument
-  {
-  private:
-    static std::string Message (const std::string & received,
-                                const std::string & expectedType);
-
-  public:
-    /// Constructor.
-    FormatError (const std::string & received     /** the received string */,
-                 const std::string & expectedType /** a string representation of the expected type */);
-
-    /// Destructor.
-    ~FormatError () throw ();
-  };
-#endif
 
 }
 
