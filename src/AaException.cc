@@ -99,21 +99,5 @@ namespace Aa
 
   ParseError::~ParseError () throw () {}
 
-#if 0
-  /* FormatError */
-
-  string FormatError::Message (const string & received, const string & expectedType)
-  {
-    ostringstream o;
-    o << printable (received) << " is not of type " << expectedType << '!';
-    return o.str ();
-  }
-
-  FormatError::FormatError (const string & received, const string & expectedType) :
-    invalid_argument (FormatError::Message (received, expectedType)) {}
-
-  FormatError::~FormatError () throw () {}
-#endif
-
 }
 

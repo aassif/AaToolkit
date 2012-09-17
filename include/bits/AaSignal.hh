@@ -1,11 +1,11 @@
-#ifndef __AA_SIGNAL__
-#define __AA_SIGNAL__
+#ifndef AA_SIGNAL__H
+#define AA_SIGNAL__H
 
 //#include "PaniniTable.hh"
 
 namespace Aa
 {
-  template <unsigned int n, class T, unsigned int m = 1>
+  template <AaUInt n, class T, AaUInt m = 1>
   class Signal : public Table<n, V<T, m>, ADB<V<T, m> > >
   {
     public:
@@ -13,7 +13,7 @@ namespace Aa
       typedef ADB<Element> Allocator;
 
     public:
-      Signal (const V<unsigned int, n> &);
+      Signal (const V<AaUInt, n> &);
 #ifdef AA_SIGNAL_DEBUG
       Signal (const Signal & s) : Table<n, Element, Allocator> (s)
       {
@@ -32,8 +32,8 @@ namespace Aa
 #endif
   };
 
-  template <unsigned int n, class T, unsigned int m>
-  Signal<n, T, m>::Signal (const V<unsigned int, n> & d) : Table<n, Element, Allocator> (d)
+  template <AaUInt n, class T, AaUInt m>
+  Signal<n, T, m>::Signal (const V<AaUInt, n> & d) : Table<n, Element, Allocator> (d)
   {
 #ifdef AA_SIGNAL_DEBUG
     std::cout << this << " Signal<" << n << ">::Signal (d = " << d << ")\n";
@@ -41,4 +41,4 @@ namespace Aa
   }
 }
 
-#endif // __AA_SIGNAL__
+#endif // AA_SIGNAL__H
