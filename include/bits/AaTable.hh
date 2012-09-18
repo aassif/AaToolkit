@@ -81,7 +81,7 @@ namespace Aa
     inline
     std::pair<V<AaUInt, m>, AaUInt> Unflatten (AaUInt k, const V<AaUInt, m> & d)
     {
-      std::pair<V<AaUInt, m-1>, AaUInt> p = Unflatten<m-1> (k, d);
+      std::pair<V<AaUInt, m-1>, AaUInt> p = Aa::details::Unflatten<m-1> (k, d);
       return std::make_pair (V<AaUInt, m> (p.first, p.second % d[m-1]), p.second / d[m-1]);
     }
 
