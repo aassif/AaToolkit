@@ -251,6 +251,22 @@ namespace Aa
     return Scale (V<T, 3> (t));
   }
 
+  template <class T>
+  AA_TOOLKIT_INLINE
+  M<T, 4, 4> Transform (const M<T, 3, 3> & r1, const V<T, 3> & t1,
+                        const M<T, 3, 3> & r2, const V<T, 3> & t2)
+  {
+    return Translation (t2) * M<T, 4, 4> (r2) * M<T, 4, 4> (r1.transpose ()) * Translation (-t1);
+  }
+
+  template <class T>
+  AA_TOOLKIT_INLINE
+  M<T, 4, 4> Transform (const M<T, 4, 4> & m1, const M<T, 4, 4> & m2)
+  {
+    return Transform (M<T, 3, 3> (m1), (const V<T, 3> &) (m1 [3]),
+                      M<T, 3, 3> (m2), (const V<T, 3> &) (m2 [3]));
+  }
+
 ////////////////////////////////////////////////////////////////////////////////
 // Typedefs (GLSL). ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
