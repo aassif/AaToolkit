@@ -1,6 +1,7 @@
 #ifndef AA_GRID_ITERATOR__H
 #define AA_GRID_ITERATOR__H
 
+#include <cstddef>
 #include <iterator>
 
 namespace Aa
