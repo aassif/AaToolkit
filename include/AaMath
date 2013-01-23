@@ -2,5 +2,5 @@
 #include "bits/AaException.h"
 #include "bits/AaPromote.hh"
 #include "bits/AaVector.hh"
-#include "bits/AaText.h"
+#include "bits/AaText.hh"
 #include "bits/AaMath.h"
