@@ -99,6 +99,14 @@ namespace Aa
     return m_point / m_weight;
   }
 
+  typedef CentroidHelper<float,  2> CentroidHelper2f;
+  typedef CentroidHelper<float,  3> CentroidHelper3f;
+  typedef CentroidHelper<float,  4> CentroidHelper4f;
+
+  typedef CentroidHelper<double, 2> CentroidHelper2d;
+  typedef CentroidHelper<double, 3> CentroidHelper3d;
+  typedef CentroidHelper<double, 4> CentroidHelper4d;
+
 } // namespace Aa
 
 #endif // AA_CENTROID__H

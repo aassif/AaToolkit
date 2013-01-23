@@ -311,6 +311,11 @@ namespace Aa
   typedef OBB<double, 2> dobb2;
   typedef OBB<double, 3> dobb3;
 
+  typedef BoxHelper<float,  2> BoxHelper2f;
+  typedef BoxHelper<float,  3> BoxHelper3f;
+  typedef BoxHelper<double, 2> BoxHelper2d;
+  typedef BoxHelper<double, 3> BoxHelper3d;
+
 } // namespace Aa
 
 #endif // AA_BOX__H
