@@ -19,17 +19,19 @@ GCC=            $(GCC_RELEASE)
 
 P_AaToolkit=    $(HOME)/wrk/toolkit
 I_AaToolkit=    -I$(P_AaToolkit)/include
-L_AaToolkit=    -L$(P_AaToolkit)/lib -lAaToolkit
+
+# Eigen ########################################################################
+
+#P_Eigen=    $(HOME)/3rdPartyLibs/eigen-eigen-XXXX
+#I_Eigen=    -I$(P_Eigen)
 
 ################################################################################
 # Variables ####################################################################
 ################################################################################
 
-EXE=            main
-HDR=            
-SRC=            
-OBJ=            $(HDR:%.h=%.moc.o) $(SRC:%.cc=%.o)
-ALL=            make.depend ../lib/libAaToolkit.so $(EXE)
+EXE=            main #eigen
+OBJ=            $(SRC:%.cc=%.o)
+ALL=            make.depend $(EXE)
 
 ################################################################################
 # Règles #######################################################################
@@ -37,21 +39,18 @@ ALL=            make.depend ../lib/libAaToolkit.so $(EXE)
 
 all:            $(ALL)
 
-main:           main.o $(OBJ)
-								$(GCC) $< $(OBJ) $(L_AaToolkit) -o $@
+main:           main.cc
+								$(GCC) $(I_AaToolkit) $< -o $@
 
-%.o:            %.cc
-								$(GCC) -c $(I_AaToolkit) $< -o $@
-
-%.moc.cc:       %.h
-								$(MOC) $< -o $@
+eigen:          eigen.cc
+								$(GCC) $(I_AaToolkit) $< -o $@
 
 ################################################################################
 # Ménage #######################################################################
 ################################################################################
 
 clean:
-								rm -f $(EXE:%=%.o) $(HDR:%.h=%.moc.cc) $(OBJ) $(ALL)
+								rm -f $(ALL)
 								rm -f core *~ gmon.* a.out
 
 ################################################################################
@@ -59,10 +58,10 @@ clean:
 ################################################################################
 
 dep:
-								g++ -MM $(I_AaToolkit) $(SRC) $(EXE:%=%.cc) >make.depend
+								g++ -MM $(I_AaToolkit) $(EXE:%=%.cc) >make.depend
 
-make.depend:    $(SRC) $(EXE:%=%.cc) Makefile
-								g++ -MM $(I_AaToolkit) $(SRC) $(EXE:%=%.cc) >make.depend
+make.depend:    $(EXE:%=%.cc) Makefile
+								g++ -MM $(I_AaToolkit) $(EXE:%=%.cc) >make.depend
 
 include make.depend
 

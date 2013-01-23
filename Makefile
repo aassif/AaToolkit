@@ -16,7 +16,7 @@ GCC=            $(GCC_RELEASE)
 
 V_AaToolkit=    AaToolkit-0.0.1
 H_AaToolkit=    include
-S_AaToolkit=    src
+#S_AaToolkit=    src
 D_AaToolkit=    doc
 I_AaToolkit=    -I$(H_AaToolkit)
 
@@ -25,12 +25,12 @@ I_AaToolkit=    -I$(H_AaToolkit)
 ################################################################################
 
 HDR=            $(wildcard $(H_AaToolkit)/*.h $(H_AaToolkit)/*.hh)
-SRC=            $(wildcard $(S_AaToolkit)/*.cc)
-OBJ=            $(SRC:%.cc=%.o)
-LIB=            lib/libAaToolkit
-STATIC=         $(LIB).a
-SHARED=         $(LIB).so
-ALL=            make.depend $(STATIC) $(SHARED)
+#SRC=            $(wildcard $(S_AaToolkit)/*.cc)
+#OBJ=            $(SRC:%.cc=%.o)
+#LIB=            lib/libAaToolkit
+#STATIC=         $(LIB).a
+#SHARED=         $(LIB).so
+#ALL=            make.depend $(STATIC) $(SHARED)
 
 ################################################################################
 # Règles #######################################################################
@@ -40,14 +40,14 @@ all:            $(ALL)
 #								echo $(HDR)
 								make -i -C bin
 
-$(STATIC):      make.depend $(OBJ)
-								ar rcs $(STATIC) $(OBJ)
+#$(STATIC):      make.depend $(OBJ)
+#								ar rcs $(STATIC) $(OBJ)
 
-$(SHARED):      make.depend $(OBJ)
-								$(GCC) -shared $(OBJ) -o $(SHARED)
+#$(SHARED):      make.depend $(OBJ)
+#								$(GCC) -shared $(OBJ) -o $(SHARED)
 
-%.o:            %.cc
-								$(GCC) -c $(I_AaToolkit) $< -o $@
+#%.o:            %.cc
+#								$(GCC) -c $(I_AaToolkit) $< -o $@
 
 ################################################################################
 # Ménage #######################################################################
@@ -60,7 +60,7 @@ doxygen:
 clean:
 								make -C bin clean
 								rm -f $(D_AaToolkit)/*
-								rm -f $(OBJ) $(ALL)
+#								rm -f $(OBJ) $(ALL)
 #								find . -name "*~" -exec rm {} \;
 
 archive:        clean
@@ -70,11 +70,11 @@ archive:        clean
 # Dépendances ##################################################################
 ################################################################################
 
-dep:
-								$(GCC) -MM $(I_AaToolkit) $(SRC) >make.depend
+#dep:
+#								$(GCC) -MM $(I_AaToolkit) $(SRC) >make.depend
 
-make.depend:    $(HDR) $(SRC)
-								$(GCC) -MM $(I_AaToolkit) $(SRC) >make.depend
+#make.depend:    $(HDR) $(SRC)
+#								$(GCC) -MM $(I_AaToolkit) $(SRC) >make.depend
 
-include make.depend
+#include make.depend
 
