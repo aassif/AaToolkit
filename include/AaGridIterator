@@ -1,4 +1,7 @@
 #include "bits/AaToolkit.h"
 #include "bits/AaException.h"
 #include "bits/AaVector.hh"
+#include "bits/AaSmartPointer.hh"
+#include "bits/AaBuffer.hh"
+#include "bits/AaTable.hh"
 #include "bits/AaGridIterator.hh"

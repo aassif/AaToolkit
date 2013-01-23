@@ -1,14 +1,107 @@
-#include <sstream>
-#include "AaXml"
+#ifndef AA_XML__H
+#define AA_XML__H
 
-using namespace std;
-using namespace Aa::TextParsing;
+#include <map>
+#include <iostream>
+#include <sstream>
 
 namespace Aa
 {
+  typedef std::string XmlId;
+  typedef std::string XmlString;
+
+  class AA_TOOLKIT_API XmlAttribs
+  {
+    public:
+      typedef std::map<XmlId, XmlString> XmlMap;
+      typedef XmlMap::/***/ iterator /***/ iterator;
+      typedef XmlMap::const_iterator const_iterator;
+
+    private:
+      XmlMap m_map;
+
+    public:
+      XmlAttribs ();
+
+      inline /***/ iterator begin () /***/ {return m_map.begin ();}
+      inline const_iterator begin () const {return m_map.begin ();}
+
+      inline /***/ iterator end () /***/ {return m_map.end ();}
+      inline const_iterator end () const {return m_map.end ();}
+
+      bool insert (const XmlId &, const XmlString &);
+      const XmlString & operator[] (const XmlId &) const;
+  };
+
+  class AA_TOOLKIT_API XmlTag
+  {
+    public:
+      enum {END_OF_FILE = -1, OPEN = 1, CLOSE = 2, COMMENT = 4};
+
+    public:
+      XmlId id;
+      XmlAttribs attribs;
+      int status;
+      XmlTag (const XmlId &, const XmlAttribs &, int = XmlTag::OPEN);
+  };
+
+  class AA_TOOLKIT_API XmlParser
+  {
+    protected:
+      XmlId m_id;
+      std::map<XmlId, XmlParser *> m_parsers;
+
+    protected:
+      typedef std::map<XmlId, XmlParser *>::      iterator       iterator;
+      typedef std::map<XmlId, XmlParser *>::const_iterator const_iterator;
+
+      inline       iterator begin ()       {return m_parsers.begin ();}
+      inline const_iterator begin () const {return m_parsers.begin ();}
+
+      inline       iterator end ()       {return m_parsers.end ();}
+      inline const_iterator end () const {return m_parsers.end ();}
+
+    public:
+      XmlParser ();
+      XmlParser (const XmlId & key, XmlParser * parent = NULL);
+      virtual ~XmlParser ();
+      virtual void parse (const XmlAttribs &)                 throw (ParseError);
+      virtual void parse (                    std::istream &) throw (ParseError);
+      virtual void parse (const XmlAttribs &, std::istream &) throw (ParseError);
+
+    public:
+      static void      ParseHeader (std::istream &);
+      static XmlId     ParseId     (std::istream &);
+      static XmlString ParseEntity (std::istream &);
+      static XmlString ParseString (std::istream &, char quote);
+      static XmlString ParseText   (std::istream &);
+      static XmlTag    ParseTag    (std::istream &);
+      static void      Skip        (std::istream &, const XmlId &);
+      static void      ParseRoot   (std::istream &, XmlParser *) throw (ParseError);
+
+      static int           ParseInt (const XmlString &)    throw (ParseError);
+      static unsigned char ParseHex (char c)               throw (ParseError);
+      static unsigned char ParseHex (char high, char low)  throw (ParseError);
+  };
+
+  template <class Data>
+  class AA_TOOLKIT_API XmlParserImpl : public XmlParser
+  {
+    protected:
+      Data * m_data;
+
+    public:
+      XmlParserImpl (const XmlString tag,
+                     Data * data,
+                     XmlParser * parent = NULL) :
+        XmlParser (tag, parent),
+        m_data (data)
+      {
+      }
+  };
 
 ////////////////////////////////////////////////////////////////////////////////
-// XmlAttribs //////////////////////////////////////////////////////////////////
+// Aa::XmlAttribs //////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
   XmlAttribs::XmlAttribs () : m_map ()
@@ -28,7 +121,7 @@ namespace Aa
   }
 
 ////////////////////////////////////////////////////////////////////////////////
-// XmlTag //////////////////////////////////////////////////////////////////////
+// Aa::XmlTag //////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
   XmlTag::XmlTag (const XmlId & xmlId,
@@ -41,7 +134,7 @@ namespace Aa
   }
 
 ////////////////////////////////////////////////////////////////////////////////
-// XmlParser ///////////////////////////////////////////////////////////////////
+// Aa::XmlParser ///////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
   XmlParser::XmlParser () :
@@ -68,14 +161,14 @@ namespace Aa
   {
   }
 
-  void XmlParser::parse (istream & is)
+  void XmlParser::parse (std::istream & is)
     throw (ParseError)
   {
     ParseText (is);
     XmlTag tag = ParseTag (is);
     while ((tag.status & XmlTag::OPEN) != 0)
     {
-      map<XmlId, XmlParser *>::const_iterator f = m_parsers.find (tag.id);
+      std::map<XmlId, XmlParser *>::const_iterator f = m_parsers.find (tag.id);
       if (f != m_parsers.end ())
       {
         if ((tag.status & XmlTag::CLOSE) == 0)
@@ -94,7 +187,7 @@ namespace Aa
     if (tag.id     != m_id)                throw ParseError::Value ('/' + m_id, tag.id);
   }
 
-  void XmlParser::parse (const XmlAttribs & attribs, istream & is)
+  void XmlParser::parse (const XmlAttribs & attribs, std::istream & is)
     throw (ParseError)
   {
     this->parse (attribs);
@@ -102,8 +195,11 @@ namespace Aa
   }
 
   // FIXME
-  void XmlParser::ParseHeader (istream & is)
+  void XmlParser::ParseHeader (std::istream & is)
   {
+    using namespace Aa::TextParsing;
+    using std::ws;
+
     is >> ws;
     is >>= "<?xml";
     while (is.get () != '>') {}
@@ -123,7 +219,7 @@ namespace Aa
     return false;
   }
 
-  XmlId XmlParser::ParseId (istream & is)
+  XmlId XmlParser::ParseId (std::istream & is)
   {
     XmlId id;
     if (accept_id_1st (is.peek ())) id += is.get ();
@@ -132,8 +228,10 @@ namespace Aa
     return id;
   }
 
-  XmlString XmlParser::ParseEntity (istream & is)
+  XmlString XmlParser::ParseEntity (std::istream & is)
   {
+    using namespace Aa::TextParsing;
+
     is >>= '&';
     XmlId entity = ParseId (is);
     is >>= ';';
@@ -146,8 +244,10 @@ namespace Aa
     else                       return '&'+entity+';';
   }
 
-  XmlId XmlParser::ParseString (istream & is, char quote)
+  XmlId XmlParser::ParseString (std::istream & is, char quote)
   {
+    using namespace Aa::TextParsing;
+
     is >>= quote;
     XmlString text;
     //while (is.peek () != quote) str += is.get ();
@@ -164,7 +264,7 @@ namespace Aa
     return text;
   }
 
-  XmlString XmlParser::ParseText (istream & is)
+  XmlString XmlParser::ParseText (std::istream & is)
   {
     XmlString text;
     for (int c = is.peek (); c != '<'; c = is.peek ())
@@ -180,8 +280,11 @@ namespace Aa
     return text;
   }
 
-  XmlTag XmlParser::ParseTag (istream & is)
+  XmlTag XmlParser::ParseTag (std::istream & is)
   {
+    using namespace Aa::TextParsing;
+    using std::ws;
+
     is >> ws;
     is >>= '<';
 //    cout << "<!--";
@@ -228,7 +331,7 @@ namespace Aa
     return XmlTag (id, attribs, status);
   }
 
-  void XmlParser::Skip (istream & is, const XmlId & id)
+  void XmlParser::Skip (std::istream & is, const XmlId & id)
   {
     //cout << "Skip: " << id << endl;
     ParseText (is);
@@ -242,7 +345,7 @@ namespace Aa
     }
   }
 
-  void XmlParser::ParseRoot (istream & is, XmlParser * p)
+  void XmlParser::ParseRoot (std::istream & is, XmlParser * p)
     throw (ParseError)
   {
     // Parse XML header.
@@ -259,7 +362,7 @@ namespace Aa
     throw (ParseError)
   {
     int value;
-    istringstream iss (xml);
+    std::istringstream iss (xml);
     if (! (iss >> value)) throw ParseError::Type ("<int>", xml);
     return value;
   }
@@ -296,5 +399,8 @@ namespace Aa
   {
     return 16 * ParseHex (high) + ParseHex (low);
   }
-}
+
+} // namespace Aa
+
+#endif // AA_XML__H
 
