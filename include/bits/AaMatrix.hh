@@ -6,6 +6,8 @@ namespace Aa
   namespace details
   {
 
+#define AA_MP(T, U, m, n) M<AA_PROMOTE(T, U), m, n>
+
 ////////////////////////////////////////////////////////////////////////////////
 // AA_VECTOR_ID (T, m, k) //////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -150,11 +152,11 @@ namespace Aa
 // Produit matriciel. //////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  template <class T, unsigned int m, unsigned int n>
+  template <class T, class U, unsigned int m, unsigned int n>
   AA_TOOLKIT_INLINE
-  V<T, m> operator* (const M<T, m, n> & m1, const V<T, n> & v1)
+  AA_VP(T,U,m) operator* (const M<T, m, n> & m1, const V<U, n> & v1)
   {
-    V<T, m> v2;
+    AA_VP(T,U,m) v2;
 
     for (unsigned int i = 0; i < m; ++i)
       v2 [i] = DotProd (m1.row (i), v1);
@@ -162,11 +164,11 @@ namespace Aa
     return v2;
   }
 
-  template <class T, unsigned int m, unsigned int n, unsigned int p>
+  template <class T, class U, unsigned int m, unsigned int n, unsigned int p>
   AA_TOOLKIT_INLINE
-  M<T, m, p> operator* (const M<T, m, n> & m1, const M<T, n, p> & m2)
+  AA_MP(T,U,m,n) operator* (const M<T, m, n> & m1, const M<U, n, p> & m2)
   {
-    M<T, m, p> m3;
+    AA_MP(T,U,m,n) m3;
 
     for (unsigned int i = 0; i < p; ++i)
       m3 [i] = m1 * m2 [i];

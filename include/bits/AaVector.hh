@@ -738,20 +738,20 @@ namespace Aa
 // Opérations. /////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  template <class T, AaUInt m>
+  template <class T, class U, AaUInt m>
   AA_TOOLKIT_INLINE
-  T DotProd (const V<T, m> & v1, const V<T, m> & v2)
+  AA_PROMOTE(T,U) DotProd (const V<T, m> & v1, const V<U, m> & v2)
   {
     return (v1 * v2).sum ();
   }
 
-  template <class T>
+  template <class T, class U>
   AA_TOOLKIT_INLINE
-  V<T, 3> CrossProd (const V<T, 3> & v1, const V<T, 3> & v2)
+  AA_VP(T,U,3) CrossProd (const V<T, 3> & v1, const V<U, 3> & v2)
   {
-    return vec<T> (v1[1] * v2[2] - v2[1] * v1[2],
-                   v1[2] * v2[0] - v2[2] * v1[0],
-                   v1[0] * v2[1] - v2[0] * v1[1]);
+    return vec (v1[1] * v2[2] - v2[1] * v1[2],
+                v1[2] * v2[0] - v2[2] * v1[0],
+                v1[0] * v2[1] - v2[0] * v1[1]);
   }
 
 ////////////////////////////////////////////////////////////////////////////////
