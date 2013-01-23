@@ -17,46 +17,46 @@ namespace Aa
       int m_num, m_den;
 
     private:
-      static int gcd (int a, int b);
+      inline static int gcd (int a, int b);
 
     public:
       // Constructor.
-      Ratio (int a = 0, int b = 1) throw (div_by_zero);
-      int numerator () const {return m_num;}
-      int denominator () const {return m_den;}
-      bool isInteger () const {return m_den == 1;}
+      inline Ratio (int a = 0, int b = 1) throw (div_by_zero);
+      inline int numerator () const {return m_num;}
+      inline int denominator () const {return m_den;}
+      inline bool isInteger () const {return m_den == 1;}
       // Assignment.
-      void assign (int a, int b) throw (div_by_zero);
+      inline void assign (int a, int b) throw (div_by_zero);
       // Negative / inverse.
-      Ratio operator- () const;
-      Ratio operator! () const throw (div_by_zero);
+      inline Ratio operator- () const;
+      inline Ratio operator! () const throw (div_by_zero);
       // Modifiers.
-      Ratio & operator+= (const Ratio &);
-      Ratio & operator-= (const Ratio &);
-      Ratio & operator*= (const Ratio &);
-      Ratio & operator/= (const Ratio &) throw (div_by_zero);
+      inline Ratio & operator+= (const Ratio &);
+      inline Ratio & operator-= (const Ratio &);
+      inline Ratio & operator*= (const Ratio &);
+      inline Ratio & operator/= (const Ratio &) throw (div_by_zero);
       // Comparators.
-      bool operator<  (const Ratio &) const;
-      bool operator== (const Ratio &) const;
+      inline bool operator<  (const Ratio &) const;
+      inline bool operator== (const Ratio &) const;
       // Conversion.
-      operator double () const;
+      inline operator double () const;
 
     public:
       // I/O.
-      void write (std::ostream &, bool verbose = false) const;
-      void read  (std::istream &) throw (ParseError);
+      inline void write (std::ostream &, bool verbose = false) const;
+      inline void read  (std::istream &) throw (ParseError);
   };
 
-  Ratio operator+ (const Ratio &, const Ratio &);
-  Ratio operator- (const Ratio &, const Ratio &);
-  Ratio operator* (const Ratio &, const Ratio &);
-  Ratio operator/ (const Ratio &, const Ratio &) throw (div_by_zero);
+  inline Ratio operator+ (const Ratio &, const Ratio &);
+  inline Ratio operator- (const Ratio &, const Ratio &);
+  inline Ratio operator* (const Ratio &, const Ratio &);
+  inline Ratio operator/ (const Ratio &, const Ratio &) throw (div_by_zero);
 
-  bool operator< (const Ratio &, double);
-  bool operator< (double, const Ratio &);
+  inline bool operator< (const Ratio &, double);
+  inline bool operator< (double, const Ratio &);
 
-  bool operator== (const Ratio &, double);
-  bool operator== (double, const Ratio &);
+  inline bool operator== (const Ratio &, double);
+  inline bool operator== (double, const Ratio &);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Aa::Ratio ///////////////////////////////////////////////////////////////////
