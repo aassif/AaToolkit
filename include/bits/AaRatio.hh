@@ -224,21 +224,21 @@ namespace Aa
   bool operator== (const Ratio & r, double d) {return (double) r == d;}
   bool operator== (double d, const Ratio & r) {return d == (double) r;}
 
+  inline AA_TOOLKIT_API
+  std::ostream & operator<< (std::ostream & o, const Aa::Ratio & r)
+  {
+    r.write (o, false);
+    return o;
+  }
+
+  inline AA_TOOLKIT_API
+  std::istream & operator>> (std::istream & i, Aa::Ratio & r)
+  {
+    r.read (i);
+    return i;
+  }
+
 } // namespace Aa
-
-inline AA_TOOLKIT_API
-std::ostream & operator<< (std::ostream & o, const Aa::Ratio & r)
-{
-  r.write (o, false);
-  return o;
-}
-
-inline AA_TOOLKIT_API
-std::istream & operator>> (std::istream & i, Aa::Ratio & r)
-{
-  r.read (i);
-  return i;
-}
 
 #if 0
 int main (int argc, char ** argv)

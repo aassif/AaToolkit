@@ -120,30 +120,29 @@ namespace Aa
     /* StringParser */
 
     /// Functor which translates strings into anything else.
+    template <class TargetType>
     struct StringParser
     {
       /// Demangled TargetType typeid.
-      template <class TargetType>
       inline static
       std::string TypeId (); // MUST BE SPECIALIZED
     
       /// Parses a string to construct an object.
       /** @exception ParseError if the string does not match the right format */
-      template <class TargetType>
       inline
       void operator() (const std::string & str /** the input string */,
                        TargetType * target     /** the object which will be constructed from str */)
         throw (ParseError)
       {
         std::istringstream i (str); i >> (*target) >> std::ws;
-        if (i.fail () || ! i.eof ()) throw ParseError::Type (TypeId<TargetType> (), str);
+        if (i.fail () || ! i.eof ()) throw ParseError::Type (TypeId (), str);
       }
     };
 
     /* StringParser specializations */
 
 #define AA_DECLARE_TYPEID(T, id) \
-    template <> inline std::string StringParser::TypeId<T> () {return id;}
+    template <> inline std::string StringParser<T>::TypeId () {return id;}
 
     AA_DECLARE_TYPEID (char,          "<char>")
     AA_DECLARE_TYPEID (unsigned char, "<uchar>")
@@ -158,8 +157,8 @@ namespace Aa
     AA_DECLARE_TYPEID (double,        "<double>")
     AA_DECLARE_TYPEID (std::string,   "<string>")
 
-    template <> inline void StringParser::operator() (const std::string & str, bool        * target) throw (ParseError);
-    template <> inline void StringParser::operator() (const std::string & str, std::string * target) throw (ParseError);
+    template <> inline void StringParser<bool>       ::operator() (const std::string & str, bool        * target) throw (ParseError);
+    template <> inline void StringParser<std::string>::operator() (const std::string & str, std::string * target) throw (ParseError);
 
     /* Parser */
 
@@ -362,7 +361,7 @@ namespace Aa
           o << ' ' << ' ';
           if (! m_longKey.empty ()) o << "  " << "--" << m_longKey;
         }
-        std::string id = StringParser::TypeId<TargetType> ();
+        std::string id = StringParser<TargetType>::TypeId ();
         for (unsigned int k = m_num; k--;) o << ' ' << id;
         return o.str ();
       }
@@ -371,18 +370,18 @@ namespace Aa
         throw (NotEnoughValues, ParseError)
       {
         m_used = true;
-        StringParser strParser;
+        StringParser<TargetType> strParser;
         TargetType * target = m_result;
         for (unsigned int k = m_num; k--; ++first)
           {
             // Has the end of input been reached?
             if (first == last)
-              throw NotEnoughValues (m_longKey, m_num, StringParser::TypeId<TargetType> ());
+              throw NotEnoughValues (m_longKey, m_num, StringParser<TargetType>::TypeId ());
             // Get the next string.
             std::string s = (*first);
             // Is this string a keyword?
             AbstractOption * o = m_parser->option (s);
-            if (o != NULL) throw NotEnoughValues (m_longKey, m_num, StringParser::TypeId<TargetType> ());
+            if (o != NULL) throw NotEnoughValues (m_longKey, m_num, StringParser<TargetType>::TypeId ());
             // Parse the string.
             strParser (s, target++);
           }
@@ -652,18 +651,18 @@ namespace Aa
 
     template <>
     inline
-    void StringParser::operator() (const std::string & str, bool * target) throw (ParseError)
+    void StringParser<bool>::operator() (const std::string & str, bool * target) throw (ParseError)
     {
       std::istringstream i (str); std::string s; i >> s >> std::ws;
-      if (i.fail () || ! i.eof ()) throw ParseError::Type (StringParser::TypeId<bool> (), str);
+      if (i.fail () || ! i.eof ()) throw ParseError::Type (StringParser<bool>::TypeId (), str);
       if (s == "true"  || s == "on"  || s == "1") {(*target) = true;  return;}
       if (s == "false" || s == "off" || s == "0") {(*target) = false; return;}
-      throw ParseError::Type (StringParser::TypeId<bool> (), str);
+      throw ParseError::Type (StringParser<bool>::TypeId (), str);
     }
 
     template <>
     inline
-    void StringParser::operator() (const std::string & str, std::string * target) throw (ParseError)
+    void StringParser<std::string>::operator() (const std::string & str, std::string * target) throw (ParseError)
     {
       (*target) = str;
     }
@@ -684,18 +683,18 @@ namespace Aa
         (*m_result) = true;
       else
         {
-          StringParser strParser;
+          StringParser<bool> strParser;
           bool * target = m_result;
           for (unsigned int k = m_num; k--; ++first)
             {
               // Has the end of input been reached?
               if (first == last)
-                throw NotEnoughValues (m_longKey, m_num, StringParser::TypeId<bool> ());
+                throw NotEnoughValues (m_longKey, m_num, StringParser<bool>::TypeId ());
               // Get the next string.
               std::string s = (*first);
               // Is this string a keyword?
               AbstractOption * o = m_parser->option (s);
-              if (o != NULL) throw NotEnoughValues (m_longKey, m_num, StringParser::TypeId<bool> ());
+              if (o != NULL) throw NotEnoughValues (m_longKey, m_num, StringParser<bool>::TypeId ());
               // Parse the string.
               strParser (s, target++);
             }
