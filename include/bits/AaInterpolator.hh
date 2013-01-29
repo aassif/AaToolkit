@@ -32,8 +32,8 @@ namespace Aa
           const V<AaUInt, k-1> & d0 = d;
           const V<float,  k-1> & p0 = p;
 
-          if (i < -1) return Parent::Interpolate (data,                      d0, p0);
-          if (i >= n) return Parent::Interpolate (data + (n-1) * d0.prod (), d0, p0);
+          if (i <    0) return Parent::Interpolate (data,                      d0, p0);
+          if (i >= n-1) return Parent::Interpolate (data + (n-1) * d0.prod (), d0, p0);
 
           V<T, m> v0 = Parent::Interpolate (data + (i + 0) * d0.prod (), d0, p0);
           V<T, m> v1 = Parent::Interpolate (data + (i + 1) * d0.prod (), d0, p0);
@@ -54,8 +54,8 @@ namespace Aa
           int    i = (int) f;
           float  t = x - f;
 
-          if (i < -1) return data [0];
-          if (i >= n) return data [n-1];
+          if (i <    0) return data [0];
+          if (i >= n-1) return data [n-1];
 
           const V<T, m> & v0 = data [i+0];
           const V<T, m> & v1 = data [i+1];
