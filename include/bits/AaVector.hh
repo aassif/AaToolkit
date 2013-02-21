@@ -53,6 +53,9 @@ namespace Aa
       // Accès aux données.
       inline /***/ T & operator[] (AaUInt) /***/ throw (std::out_of_range);
       inline const T & operator[] (AaUInt) const throw (std::out_of_range);
+      // Swizzling.
+      template <AaUInt n>
+      inline V<T, n> operator() (const V<AaUInt, n> &) const throw (std::out_of_range);
       // Addition.
       template <class U> inline Self       & operator+= (const U &);
       template <class U> inline AA_VP(T,U,m) operator+  (const U &) const;
@@ -97,6 +100,8 @@ namespace Aa
       // Minimum et maximum.
       inline AaUInt min () const;
       inline AaUInt max () const;
+      // Sous-vecteur.
+      inline V<T, m-1> sub (AaUInt) const;
 
     public:
       inline static Self Min (const Self &, const Self &);
@@ -150,6 +155,13 @@ namespace Aa
   {
     details::CheckRange (i, m);
     return V<T, 1>::value (i);
+  }
+
+  template <class T, AaUInt m>
+  template <AaUInt n>
+  V<T, n> V<T, m>::operator() (const V<AaUInt, n> & v) const throw (std::out_of_range)
+  {
+    return V<T, 1>::swizzle (v, m);
   }
 
 #if 1
@@ -394,6 +406,15 @@ namespace Aa
     return V<T, m> (Parent::Max (v1, v2), v1.m_value < v2.m_value ? v2.m_value : v1.m_value);
   }
 
+  template <class T, AaUInt m>
+  V<T, m-1> V<T, m>::sub (AaUInt k) const
+  {
+    V<AaUInt, m-1> v;
+    for (AaUInt i = 0; i < m; ++i)
+      v [i] = (i < k ? i : i+1);
+    return this->swizzle (v, m);
+  }
+
 ////////////////////////////////////////////////////////////////////////////////
 // Vecteur mono-composante. ////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -412,6 +433,9 @@ namespace Aa
       inline /***/ T & value (AaUInt i) /***/ {return (&m_value) [i];}
       inline const T & value (AaUInt i) const {return (&m_value) [i];}
 
+      template <AaUInt n>
+      inline V<T, n> swizzle (const V<AaUInt, n> &, AaUInt max) const throw (std::out_of_range);
+
     public:
       // Constructeurs.
       inline V (const T & t = T ()) : m_value (t) {}
@@ -420,6 +444,9 @@ namespace Aa
       // Accès aux données.
       inline /***/ T & operator[] (AaUInt) /***/ throw (std::out_of_range);
       inline const T & operator[] (AaUInt) const throw (std::out_of_range);
+      // Swizzling.
+      template <AaUInt n>
+      inline V<T, n> operator() (const V<AaUInt, n> &) const throw (std::out_of_range);
       // Addition.
       template <class U> inline Self       & operator+= (const U &);
       template <class U> inline AA_VP(T,U,1) operator+  (const U &) const;
@@ -475,6 +502,20 @@ namespace Aa
   }
 
   template <class T>
+  template <AaUInt n>
+  V<T, n> V<T, 1>::swizzle (const V<AaUInt, n> & v, AaUInt max) const throw (std::out_of_range)
+  {
+    V<T, n> r;
+    for (AaUInt i = 0; i < n; ++i)
+    {
+      AaUInt j = v [i];
+      details::CheckRange (j, max);
+      r [i] = this->value (j);
+    }
+    return r;
+  }
+
+  template <class T>
   T & V<T, 1>::operator[] (AaUInt i) throw (std::out_of_range)
   {
     details::CheckRange (i, 1);
@@ -486,6 +527,13 @@ namespace Aa
   {
     details::CheckRange (i, 1);
     return m_value;
+  }
+
+  template <class T>
+  template <AaUInt n>
+  V<T, n> V<T, 1>::operator() (const V<AaUInt, n> & v) const throw (std::out_of_range)
+  {
+    return V<T, 1>::swizzle (v, 1);
   }
 
 #if 1

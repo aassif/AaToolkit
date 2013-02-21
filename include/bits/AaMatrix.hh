@@ -12,14 +12,14 @@ namespace Aa
 // AA_VECTOR_ID (T, m, k) //////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-#define AA_VECTOR_ID(T, m, k) VectorId<m>::template Id<T> (k)
+#define AA_VECTOR_ID(T, m, k) VectorId<m>::template Id<T, k> ()
 
-    template <unsigned int m>
+    template <AaUInt m>
     struct VectorId
     {
-      template <class T>
+      template <class T, AaUInt k>
       inline static
-      V<T, m> Id (unsigned int k)
+      V<T, m> Id ()
       {
         return V<T, m> (AA_VECTOR_ID (T, m-1, k), k == m-1 ? 1 : 0);
       }
@@ -28,9 +28,9 @@ namespace Aa
     template <>
     struct VectorId<1>
     {
-      template <class T>
+      template <class T, AaUInt k>
       inline static
-      V<T, 1> Id (unsigned int k)
+      V<T, 1> Id ()
       {
         return V<T, 1> (k == 0 ? 1 : 0);
       }
@@ -42,7 +42,7 @@ namespace Aa
 
 #define AA_MATRIX_ID(T, m, n) MatrixId<m, n>::template Id<T> ()
 
-    template <unsigned int m, unsigned int n>
+    template <AaUInt m, AaUInt n>
     struct MatrixId
     {
       template <class T>
@@ -53,7 +53,7 @@ namespace Aa
       }
     };
 
-    template <unsigned int m>
+    template <AaUInt m>
     struct MatrixId<m, 1>
     {
       template <class T>
@@ -63,9 +63,10 @@ namespace Aa
         return V<V<T, m>, 1> (AA_VECTOR_ID (T, m, 0));
       }
     };
-  }
 
-  template <class T, unsigned int m, unsigned int n>
+  } // namespace details
+
+  template <class T, AaUInt m, AaUInt n>
   class M : public V<V<T, m>, n>
   {
     public:
@@ -99,16 +100,16 @@ namespace Aa
       {
       }
 
-      template <class U, unsigned int p, unsigned int q>
+      template <class U, AaUInt p, AaUInt q>
       inline
       M (const M<U, p, q> & u) :
         Parent (Id ())
       {
-        const unsigned int cols = (n < q ? n : q);
-        const unsigned int rows = (m < p ? m : p);
+        const AaUInt cols = (n < q ? n : q);
+        const AaUInt rows = (m < p ? m : p);
 
-        for (unsigned int c = 0; c < cols; ++c)
-          for (unsigned int r = 0; r < rows; ++r)
+        for (AaUInt c = 0; c < cols; ++c)
+          for (AaUInt r = 0; r < rows; ++r)
             (*this) [c][r] = static_cast<T> (u [c][r]);
       }
 
@@ -120,17 +121,17 @@ namespace Aa
       }
 
       inline
-      Column col (unsigned int k) const
+      Column col (AaUInt k) const
       {
         return (*this) [k];
       }
 
       inline
-      Row row (unsigned int k) const
+      Row row (AaUInt k) const
       {
         Row row;
 
-        for (unsigned int c = 0; c < n; ++c)
+        for (AaUInt c = 0; c < n; ++c)
           row [c] = (*this) [c][k];
 
         return row;
@@ -141,8 +142,23 @@ namespace Aa
       {
         M<T, n, m> matrix;
 
-        for (unsigned int r = 0; r < m; ++r)
+        for (AaUInt r = 0; r < m; ++r)
           matrix [r] = this->row (r);
+
+        return matrix;
+      }
+
+      inline
+      M<T, n-1, m-1> sub (AaUInt i, AaUInt j) const
+      {
+        V<AaUInt, m-1> v;
+        for (AaUInt k = 0; k < m-1; ++k)
+          v [k] = (k < j ? k : k+1);
+
+        M<T, n-1, m-1> matrix;
+
+        for (AaUInt k = 0; k < n-1; ++k)
+          matrix [k] = this->col (k < i ? k : k+1) (v);
 
         return matrix;
       }
@@ -152,25 +168,44 @@ namespace Aa
 // Produit matriciel. //////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  template <class T, class U, unsigned int m, unsigned int n>
+  template <class T, class U, AaUInt m, AaUInt n>
+  AA_TOOLKIT_INLINE
+  AA_MP(T,U,m,n) operator* (const M<T, m, n> & m1, U u)
+  {
+    AA_MP(T,U,m,n) m2;
+
+    for (AaUInt i = 0; i < m; ++i)
+      m2 [i] = m1 [i] * u;
+
+    return m2;
+  }
+
+  template <class T, class U, AaUInt m, AaUInt n>
+  AA_TOOLKIT_INLINE
+  AA_MP(T,U,m,n) operator* (T t, const M<U, m, n> & m1)
+  {
+    return m1 * t;
+  }
+
+  template <class T, class U, AaUInt m, AaUInt n>
   AA_TOOLKIT_INLINE
   AA_VP(T,U,m) operator* (const M<T, m, n> & m1, const V<U, n> & v1)
   {
     AA_VP(T,U,m) v2;
 
-    for (unsigned int i = 0; i < m; ++i)
+    for (AaUInt i = 0; i < m; ++i)
       v2 [i] = DotProd (m1.row (i), v1);
 
     return v2;
   }
 
-  template <class T, class U, unsigned int m, unsigned int n, unsigned int p>
+  template <class T, class U, AaUInt m, AaUInt n, AaUInt p>
   AA_TOOLKIT_INLINE
   AA_MP(T,U,m,n) operator* (const M<T, m, n> & m1, const M<U, n, p> & m2)
   {
     AA_MP(T,U,m,n) m3;
 
-    for (unsigned int i = 0; i < p; ++i)
+    for (AaUInt i = 0; i < p; ++i)
       m3 [i] = m1 * m2 [i];
 
     return m3;
@@ -180,28 +215,28 @@ namespace Aa
 // Raccourcis. /////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  template <class T, unsigned int m>
+  template <class T, AaUInt m>
   AA_TOOLKIT_INLINE
   M<T, m, 1> mat (const V<T, m> & c1)
   {
     return M<T, m, 1> (vec (c1));
   }
 
-  template <class T, unsigned int m>
+  template <class T, AaUInt m>
   AA_TOOLKIT_INLINE
   M<T, m, 2> mat (const V<T, m> & c1, const V<T, m> & c2)
   {
     return M<T, m, 2> (vec (c1, c2));
   }
 
-  template <class T, unsigned int m>
+  template <class T, AaUInt m>
   AA_TOOLKIT_INLINE
   M<T, m, 3> mat (const V<T, m> & c1, const V<T, m> & c2, const V<T, m> & c3)
   {
     return M<T, m, 3> (vec (c1, c2, c3));
   }
 
-  template <class T, unsigned int m>
+  template <class T, AaUInt m>
   AA_TOOLKIT_INLINE
   M<T, m, 4> mat (const V<T, m> & c1, const V<T, m> & c2, const V<T, m> & c3, const V<T, m> & c4)
   {
@@ -209,12 +244,101 @@ namespace Aa
   }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Aa::M2<T, m> //////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  template <class T, AaUInt m>
+  class M2 : public M<T, m, m>
+  {
+    public:
+      inline
+      M2 () :
+        M<T, m, m> ()
+      {
+      }
+
+      inline
+      M2 (const M<T, m, m> & matrix) :
+        M<T, m, m> (matrix)
+      {
+      }
+
+      template <class U, AaUInt p, AaUInt q>
+      inline
+      M2 (const M<U, p, q> & u) :
+        M<T, m, m> (u)
+      {
+      }
+
+      inline explicit
+      M2 (const T * data) :
+        M<T, m, m> (data)
+      {
+      }
+
+      inline
+      T cofactor (AaUInt i, AaUInt j) const
+      {
+        M2<T, m-1> matrix = this->sub (i, j);
+        return (((i+j) & 1) ? -1 : +1) * matrix.det ();
+      }
+
+      inline
+      T det () const
+      {
+        T d = 0;
+        for (AaUInt i = 0; i < m; ++i)
+          d += (*this)[0][i] * this->cofactor (0, i);
+        return d;
+      }
+
+      inline
+      M2<T, m> adj () const
+      {
+        M2<T, m> a;
+        for (AaUInt i = 0; i < m; ++i)
+          for (AaUInt j = 0; j < m; ++j)
+            a [i][j] = this->cofactor (j, i);
+        return a;
+      }
+
+      inline
+      M2<double, m> inv () const throw (div_by_zero)
+      {
+        T d = this->det ();
+        if (d == 0) throw div_by_zero ();
+        return (1.0 / d) * this->adj ();
+      }
+  };
+
+  template <class T>
+  class M2<T, 1> : public M<T, 1, 1>
+  {
+    public:
+      inline
+      M2 (const M<T, 1, 1> & matrix = M<T, 1, 1> ()) :
+        M<T, 1, 1> (matrix)
+      {
+      }
+
+      inline T det () const {return (*this) [0][0];};
+
+      inline
+      M<double, 1, 1> inv () const throw (div_by_zero)
+      {
+        T d = this->det ();
+        if (d == 0) throw div_by_zero ();
+        return M<double, 1, 1> (1.0 / d);
+      }
+  };
+
+////////////////////////////////////////////////////////////////////////////////
 // Transformations. ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
   template <class T>
   AA_TOOLKIT_INLINE
-  M<T, 4, 4> Translation (const V<T, 3> & t)
+  M2<T, 4> Translation (const V<T, 3> & t)
   {
     return mat (vec<T> (1,    0,    0,    0),
                 vec<T> (0,    1,    0,    0),
@@ -224,7 +348,7 @@ namespace Aa
 
   template <class T>
   AA_TOOLKIT_INLINE
-  M<T, 4, 4> Rotation (const T & angle, const V<T, 3> & axis)
+  M2<T, 4> Rotation (const T & angle, const V<T, 3> & axis)
     throw (div_by_zero)
   {
     V<T, 3> v = axis.normalize ();
@@ -238,7 +362,7 @@ namespace Aa
 
   template <class T>
   AA_TOOLKIT_INLINE
-  M<T, 4, 4> Scale (const V<T, 3> & s)
+  M2<T, 4> Scale (const V<T, 3> & s)
   {
     return mat (vec<T> (s[0], 0,    0,    0),
                 vec<T> (0,    s[1], 0,    0),
@@ -248,40 +372,41 @@ namespace Aa
 
   template <class T>
   AA_TOOLKIT_INLINE
-  M<T, 4, 4> Scale (const T & t)
+  M2<T, 4> Scale (const T & t)
   {
     return Scale (V<T, 3> (t));
   }
 
   template <class T>
   AA_TOOLKIT_INLINE
-  M<T, 4, 4> Transform (const M<T, 3, 3> & r1, const V<T, 3> & t1,
-                        const M<T, 3, 3> & r2, const V<T, 3> & t2)
+  M2<T, 4> Transform (const M2<T, 3> & r1, const V<T, 3> & t1,
+                      const M2<T, 3> & r2, const V<T, 3> & t2)
   {
-    return Translation (t2) * M<T, 4, 4> (r2) * M<T, 4, 4> (r1.transpose ()) * Translation (-t1);
+    return Translation (t2) * M2<T, 4> (r2) * M2<T, 4> (r1.inv ()) * Translation (-t1);
   }
 
   template <class T>
   AA_TOOLKIT_INLINE
-  M<T, 4, 4> Transform (const M<T, 4, 4> & m1, const M<T, 4, 4> & m2)
+  M2<T, 4> Transform (const M2<T, 4> & m1,
+                      const M2<T, 4> & m2)
   {
-    return Transform (M<T, 3, 3> (m1), (const V<T, 3> &) (m1 [3]),
-                      M<T, 3, 3> (m2), (const V<T, 3> &) (m2 [3]));
+    return Transform (M2<T, 3> (m1), (const V<T, 3> &) (m1 [3]),
+                      M2<T, 3> (m2), (const V<T, 3> &) (m2 [3]));
   }
 
 ////////////////////////////////////////////////////////////////////////////////
 // MatrixFunctor<T, k> /////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  template <class T, unsigned int k = 1>
+  template <class T, AaUInt k = 1>
   class MatrixFunctor
   {
     private:
-      M<T, 4, 4> m_matrix;
+      M2<T, 4> m_matrix;
 
     public:
       inline
-      MatrixFunctor (const M<T, 4, 4> & matrix) :
+      MatrixFunctor (const M2<T, 4> & matrix) :
         m_matrix (matrix)
       {
       }
@@ -297,41 +422,41 @@ namespace Aa
 // Typedefs (GLSL). ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  typedef M<float,  2, 2>  mat2;
-  typedef M<float,  2, 3>  mat2x3;
-  typedef M<float,  2, 4>  mat2x4;
+  typedef M2<float,  2>     mat2;
+  typedef M <float,  2, 3>  mat2x3;
+  typedef M <float,  2, 4>  mat2x4;
 
-  typedef M<float,  3, 2>  mat3x2;
-  typedef M<float,  3, 3>  mat3;
-  typedef M<float,  3, 4>  mat3x4;
+  typedef M <float,  3, 2>  mat3x2;
+  typedef M2<float,  3>     mat3;
+  typedef M <float,  3, 4>  mat3x4;
 
-  typedef M<float,  4, 2>  mat4x2;
-  typedef M<float,  4, 3>  mat4x3;
-  typedef M<float,  4, 4>  mat4;
+  typedef M <float,  4, 2>  mat4x2;
+  typedef M <float,  4, 3>  mat4x3;
+  typedef M2<float,  4>     mat4;
 
-  typedef M<double, 2, 2> dmat2;
-  typedef M<double, 2, 3> dmat2x3;
-  typedef M<double, 2, 4> dmat2x4;
+  typedef M2<double, 2>    dmat2;
+  typedef M <double, 2, 3> dmat2x3;
+  typedef M <double, 2, 4> dmat2x4;
 
-  typedef M<double, 3, 2> dmat3x2;
-  typedef M<double, 3, 3> dmat3;
-  typedef M<double, 3, 4> dmat3x4;
+  typedef M <double, 3, 2> dmat3x2;
+  typedef M2<double, 3>    dmat3;
+  typedef M <double, 3, 4> dmat3x4;
 
-  typedef M<double, 4, 2> dmat4x2;
-  typedef M<double, 4, 3> dmat4x3;
-  typedef M<double, 4, 4> dmat4;
+  typedef M <double, 4, 2> dmat4x2;
+  typedef M <double, 4, 3> dmat4x3;
+  typedef M2<double, 4>    dmat4;
 
-  typedef M<int,    2, 2> imat2;
-  typedef M<int,    2, 3> imat2x3;
-  typedef M<int,    2, 4> imat2x4;
+  typedef M2<int,    2>    imat2;
+  typedef M <int,    2, 3> imat2x3;
+  typedef M <int,    2, 4> imat2x4;
 
-  typedef M<int,    3, 2> imat3x2;
-  typedef M<int,    3, 3> imat3;
-  typedef M<int,    3, 4> imat3x4;
+  typedef M <int,    3, 2> imat3x2;
+  typedef M2<int,    3>    imat3;
+  typedef M <int,    3, 4> imat3x4;
 
-  typedef M<int,    4, 2> imat4x2;
-  typedef M<int,    4, 3> imat4x3;
-  typedef M<int,    4, 4> imat4;
+  typedef M <int,    4, 2> imat4x2;
+  typedef M <int,    4, 3> imat4x3;
+  typedef M2<int,    4>    imat4;
 
 } // namespace Aa
 

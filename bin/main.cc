@@ -24,6 +24,7 @@ int main (int argc, char ** argv)
   dvec3 v3 = 6 + v1; //vec (7.0, 8.0, 9.0);
   cout << "v3 = 6 + v2 = " << v3 << endl;
 
+  cout << "v3 (0, 2, 1, 1) = " << v3 (vec (0u, 2u, 1u, 1u)) << endl;
   dmat4 m0;
   cout << "m0 = " << m0 << endl;
 
@@ -34,6 +35,9 @@ int main (int argc, char ** argv)
   cout << "m1 * v1 = " << (m1 * v1) << endl;
   cout << "m1 * v2 = " << (m1 * v2) << endl;
   cout << "m1 * v3 = " << (m1 * v3) << endl;
+
+  cout << "m1.det () = " << m1.det () << endl;
+  try {m1.inv ();} catch (div_by_zero &) {cerr << "m1 n'est pas inversible !" << endl;}
 
   dvec2 v5 = v1;
   cout << "v5 = " << v5 << endl;
@@ -57,14 +61,30 @@ int main (int argc, char ** argv)
 
   cout << "mat4 (m2) = " << mat4 (m2) << endl;
 
-  float data [16] =
+  float data4x4 [16] =
   {
      0,  1,  2,  3,
      4,  5,  6,  7,
      8,  9, 10, 11,
     12, 13, 14, 15
   };
-  cout << "mat4 (data) = " << mat4 (data) << endl;
+
+  mat4 m4 (data4x4);
+  cout << "m4 = " << m4 << endl;
+  cout << "m4.sub (1, 3) = " << m4.sub (1, 3) << endl;
+
+  float data3x3 [9] =
+  {
+    -2, -1,  2,
+     2,  1,  0,
+    -3,  3, -1
+  };
+
+  mat3 m5 (data3x3);
+  cout << "m5 = " << m5 << endl;
+  cout << "m5.det () = " << m5.det () << endl;
+  cout << "m5.inv () = " << m5.inv () << endl;
+  cout << "m5 * m5.inv () = " << (m5 * m5.inv ()) << endl;
 #endif
 
 #if 1
