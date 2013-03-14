@@ -390,8 +390,20 @@ namespace Aa
   M2<T, 4> Transform (const M2<T, 4> & m1,
                       const M2<T, 4> & m2)
   {
+#if 0
     return Transform (M2<T, 3> (m1), (const V<T, 3> &) (m1 [3]),
                       M2<T, 3> (m2), (const V<T, 3> &) (m2 [3]));
+#else
+    return m2 * m1.inv ();
+#endif
+  }
+
+  template <class T>
+  AA_TOOLKIT_INLINE
+  M2<T, 4> Transform (const M<T, 4, 4> & m1,
+                      const M<T, 4, 4> & m2)
+  {
+    return Transform (M2<T, 4> (m2), M2<T, 4> (m1));
   }
 
 ////////////////////////////////////////////////////////////////////////////////
