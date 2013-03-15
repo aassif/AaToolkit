@@ -1,5 +1,6 @@
 #include "bits/AaToolkit.h"
 #include "bits/AaException.hh"
+#include "bits/AaPromote.hh"
 #include "bits/AaVector.hh"
 #include "bits/AaSmartPointer.hh"
 #include "bits/AaBuffer.hh"
