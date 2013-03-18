@@ -20,15 +20,27 @@ namespace Aa
       AaUInt       m_pos;
 
     public:
-      inline
-      explicit
+      inline static
+      GridIterator Begin (const V<AaUInt, m> & d)
+      {
+        return GridIterator (d, V<AaUInt, m> (0));
+      }
+
+      inline static
+      GridIterator End (const V<AaUInt, m> & d)
+      {
+        return GridIterator (d);
+      }
+
+    private:
+      inline explicit
       GridIterator (const V<AaUInt, m> & d) :
         m_dim (d),
         m_pos (d.prod ())
       {
       }
 
-      inline
+      inline explicit
       GridIterator (const V<AaUInt, m> & d,
                     const V<AaUInt, m> & p) :
         m_dim (d),
@@ -36,6 +48,7 @@ namespace Aa
       {
       }
 
+    public:
       inline
       V<AaUInt, m> operator* () const
       {
