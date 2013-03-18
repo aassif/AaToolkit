@@ -115,7 +115,6 @@ namespace Aa
     public:
       Table (const V<AaUInt, n> & d) throw (std::bad_alloc);
       // Gestion du buffer.
-      inline void alloc (AaUInt);
       inline void alloc (const V<AaUInt, n> & d);
       inline void disconnect ();
       // Dimensions.
@@ -135,15 +134,6 @@ namespace Aa
     std::cout << this << " Table<" << n << ">::Table (d = " << d << ")\n";
 #endif
     alloc (d);
-  }
-
-  template <AaUInt n, class T, class A>
-  void Table<n, T, A>::alloc (AaUInt d)
-  {
-#ifdef AA_TABLE_DEBUG
-    std::cout << this << " Table<" << n << ">::alloc (d = " << d << ")\n";
-#endif
-    alloc (V<AaUInt, n> (d));
   }
 
   template <AaUInt n, class T, class A>
