@@ -6,4 +6,5 @@
 #include "bits/AaBuffer.hh"
 #include "bits/AaTable.hh"
 #include "bits/AaSignal.hh"
+#include "bits/AaGridIterator.hh"
 #include "bits/AaInterpolator.hh"
