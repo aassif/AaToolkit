@@ -1,5 +1,5 @@
-#ifndef __AA_MATRIX__
-#define __AA_MATRIX__
+#ifndef AA_MATRIX__H
+#define AA_MATRIX__H
 
 namespace Aa
 {
@@ -435,42 +435,42 @@ namespace Aa
 ////////////////////////////////////////////////////////////////////////////////
 
   typedef M2<float,  2>     mat2;
-  typedef M <float,  2, 3>  mat2x3;
-  typedef M <float,  2, 4>  mat2x4;
+  typedef M <float,  2, 3>  mat3x2;
+  typedef M <float,  2, 4>  mat4x2;
 
-  typedef M <float,  3, 2>  mat3x2;
+  typedef M <float,  3, 2>  mat2x3;
   typedef M2<float,  3>     mat3;
-  typedef M <float,  3, 4>  mat3x4;
+  typedef M <float,  3, 4>  mat4x3;
 
-  typedef M <float,  4, 2>  mat4x2;
-  typedef M <float,  4, 3>  mat4x3;
+  typedef M <float,  4, 2>  mat2x4;
+  typedef M <float,  4, 3>  mat3x4;
   typedef M2<float,  4>     mat4;
 
   typedef M2<double, 2>    dmat2;
-  typedef M <double, 2, 3> dmat2x3;
-  typedef M <double, 2, 4> dmat2x4;
+  typedef M <double, 2, 3> dmat3x2;
+  typedef M <double, 2, 4> dmat4x2;
 
-  typedef M <double, 3, 2> dmat3x2;
+  typedef M <double, 3, 2> dmat2x3;
   typedef M2<double, 3>    dmat3;
-  typedef M <double, 3, 4> dmat3x4;
+  typedef M <double, 3, 4> dmat4x3;
 
-  typedef M <double, 4, 2> dmat4x2;
-  typedef M <double, 4, 3> dmat4x3;
+  typedef M <double, 4, 2> dmat2x4;
+  typedef M <double, 4, 3> dmat3x4;
   typedef M2<double, 4>    dmat4;
 
   typedef M2<int,    2>    imat2;
-  typedef M <int,    2, 3> imat2x3;
-  typedef M <int,    2, 4> imat2x4;
+  typedef M <int,    2, 3> imat3x2;
+  typedef M <int,    2, 4> imat4x2;
 
-  typedef M <int,    3, 2> imat3x2;
+  typedef M <int,    3, 2> imat2x3;
   typedef M2<int,    3>    imat3;
-  typedef M <int,    3, 4> imat3x4;
+  typedef M <int,    3, 4> imat4x3;
 
-  typedef M <int,    4, 2> imat4x2;
-  typedef M <int,    4, 3> imat4x3;
+  typedef M <int,    4, 2> imat2x4;
+  typedef M <int,    4, 3> imat3x4;
   typedef M2<int,    4>    imat4;
 
 } // namespace Aa
 
-#endif // __AA_MATRIX__
+#endif // AA_MATRIX__H
 
