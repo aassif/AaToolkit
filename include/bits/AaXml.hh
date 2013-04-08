@@ -21,7 +21,7 @@ namespace Aa
       XmlMap m_map;
 
     public:
-      XmlAttribs ();
+      inline XmlAttribs ();
 
       inline /***/ iterator begin () /***/ {return m_map.begin ();}
       inline const_iterator begin () const {return m_map.begin ();}
@@ -29,8 +29,8 @@ namespace Aa
       inline /***/ iterator end () /***/ {return m_map.end ();}
       inline const_iterator end () const {return m_map.end ();}
 
-      bool insert (const XmlId &, const XmlString &);
-      const XmlString & operator[] (const XmlId &) const;
+      inline bool insert (const XmlId &, const XmlString &);
+      inline const XmlString & operator[] (const XmlId &) const;
   };
 
   class AA_TOOLKIT_API XmlTag
@@ -42,7 +42,7 @@ namespace Aa
       XmlId id;
       XmlAttribs attribs;
       int status;
-      XmlTag (const XmlId &, const XmlAttribs &, int = XmlTag::OPEN);
+      inline XmlTag (const XmlId &, const XmlAttribs &, int = XmlTag::OPEN);
   };
 
   class AA_TOOLKIT_API XmlParser
@@ -62,26 +62,26 @@ namespace Aa
       inline const_iterator end () const {return m_parsers.end ();}
 
     public:
-      XmlParser ();
-      XmlParser (const XmlId & key, XmlParser * parent = NULL);
-      virtual ~XmlParser ();
-      virtual void parse (const XmlAttribs &)                 throw (ParseError);
-      virtual void parse (                    std::istream &) throw (ParseError);
-      virtual void parse (const XmlAttribs &, std::istream &) throw (ParseError);
+      inline XmlParser ();
+      inline XmlParser (const XmlId & key, XmlParser * parent = NULL);
+      inline virtual ~XmlParser ();
+      inline virtual void parse (const XmlAttribs &)                 throw (ParseError);
+      inline virtual void parse (                    std::istream &) throw (ParseError);
+      inline virtual void parse (const XmlAttribs &, std::istream &) throw (ParseError);
 
     public:
-      static void      ParseHeader (std::istream &);
-      static XmlId     ParseId     (std::istream &);
-      static XmlString ParseEntity (std::istream &);
-      static XmlString ParseString (std::istream &, char quote);
-      static XmlString ParseText   (std::istream &);
-      static XmlTag    ParseTag    (std::istream &);
-      static void      Skip        (std::istream &, const XmlId &);
-      static void      ParseRoot   (std::istream &, XmlParser *) throw (ParseError);
+      inline static void      ParseHeader (std::istream &);
+      inline static XmlId     ParseId     (std::istream &);
+      inline static XmlString ParseEntity (std::istream &);
+      inline static XmlString ParseString (std::istream &, char quote);
+      inline static XmlString ParseText   (std::istream &);
+      inline static XmlTag    ParseTag    (std::istream &);
+      inline static void      Skip        (std::istream &, const XmlId &);
+      inline static void      ParseRoot   (std::istream &, XmlParser *) throw (ParseError);
 
-      static int           ParseInt (const XmlString &)    throw (ParseError);
-      static unsigned char ParseHex (char c)               throw (ParseError);
-      static unsigned char ParseHex (char high, char low)  throw (ParseError);
+      inline static int           ParseInt (const XmlString &)    throw (ParseError);
+      inline static unsigned char ParseHex (char c)               throw (ParseError);
+      inline static unsigned char ParseHex (char high, char low)  throw (ParseError);
   };
 
   template <class Data>
@@ -91,6 +91,7 @@ namespace Aa
       Data * m_data;
 
     public:
+      inline
       XmlParserImpl (const XmlString tag,
                      Data * data,
                      XmlParser * parent = NULL) :
@@ -205,15 +206,18 @@ namespace Aa
     while (is.get () != '>') {}
   }
 
-  bool accept_id_1st (char c)
+  inline
+  bool xml_accept_id_1st (char c)
   {
     if (c == '_' || c == ':') return true;
     if (isalpha (c)) return true;
     return false;
   }
-  bool accept_id (char c)
+
+  inline
+  bool xml_accept_id (char c)
   {
-    if (accept_id_1st (c)) return true;
+    if (xml_accept_id_1st (c)) return true;
     if (c == '-' || c == '.') return true;
     if (isdigit (c)) return true;
     return false;
@@ -222,8 +226,8 @@ namespace Aa
   XmlId XmlParser::ParseId (std::istream & is)
   {
     XmlId id;
-    if (accept_id_1st (is.peek ())) id += is.get ();
-    while (accept_id (is.peek ())) id += is.get ();
+    if (xml_accept_id_1st (is.peek ())) id += is.get ();
+    while (xml_accept_id (is.peek ())) id += is.get ();
     //cout << "(id:" << id << ')';
     return id;
   }
