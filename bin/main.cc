@@ -45,7 +45,7 @@ int main (int argc, char ** argv)
   dvec2 v6 = vec (0.0, 1.0);
   cout << "v6 = " << v6 << endl;
 
-  dmat3x2 m2 = mat (v1, v2);
+  dmat2x3 m2 = mat (v1, v2);
   cout << "m2 = " << m2 << endl;
   cout << "sizeof (m2) = " << sizeof (m2) << endl;
 
