@@ -244,7 +244,7 @@ namespace Aa
   }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Aa::M2<T, m> //////////////////////////////////////////////////////
+// Aa::M2<T, m> ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
   template <class T, AaUInt m>
@@ -324,11 +324,11 @@ namespace Aa
       inline T det () const {return (*this) [0][0];};
 
       inline
-      M<double, 1, 1> inv () const throw (div_by_zero)
+      M2<double, 1> inv () const throw (div_by_zero)
       {
         T d = this->det ();
         if (d == 0) throw div_by_zero ();
-        return M<double, 1, 1> (1.0 / d);
+        return M2<double, 1> (1.0 / d);
       }
   };
 
