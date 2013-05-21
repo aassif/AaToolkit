@@ -113,7 +113,7 @@ namespace Aa
       V<AaUInt, n> m_dims;
 
     public:
-      Table (const V<AaUInt, n> & d) throw (std::bad_alloc);
+      Table (const V<AaUInt, n> & d = V<AaUInt, n> (0)) throw (std::bad_alloc);
       // Gestion du buffer.
       inline void alloc (const V<AaUInt, n> & d);
       inline void disconnect ();
