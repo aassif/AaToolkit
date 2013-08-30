@@ -78,20 +78,29 @@ namespace Aa
     public:
       template <class U>
       inline static
-      Signal<n, U, m> Resample (const Signal<n, T, m> * s1,
-                                const V<AaUInt, n>    & d2)
+      void Resample (const Signal<n, T, m> * s1,
+                     /***/ Signal<n, U, m> * s2)
       {
-        Signal<n, U, m> s2 (d2);
         Interpolator interpolator (s1);
+        const uvec3 & d2 = s2->dims ();
         vec3 ratio = vec3 (s1->dims ()) / d2;
-        typedef GridIterator<3> Iterator;
+        typedef GridIterator<n> Iterator;
         for (Iterator it = Iterator::Begin (d2); it != Iterator::End (d2);)
         {
           uvec3 v2 = *(it++);
           vec3 v1 = 0.5f + (v2 * ratio);
-          //s2 [v2] = interpolator (v1);
-          s2 [v2] = (*s1) [uvec3 (v1)];
+          //(*s2) [v2] = interpolator (v1);
+          (*s2) [v2] = (*s1) [uvec3 (v1)];
         }
+      }
+
+      template <class U>
+      inline static
+      Signal<n, U, m> Resample (const Signal<n, T, m> * s1,
+                                const V<AaUInt, n>    & d2)
+      {
+        Signal<n, U, m> s2 (d2);
+        Interpolator::Resample (s1, &s2);
         return s2;
       }
 
