@@ -17,7 +17,7 @@ namespace Aa
   {
     private:
       V<T, m> m_pos;
-      V<T, m> m_dim;
+      V<T, m> m_dims;
 
     public:
       inline Box ();
@@ -39,8 +39,14 @@ namespace Aa
       inline Box   operator&  (const Box &) const;
 
       // Data accessors.
-      inline const V<T, m> & pos () const;
-      inline const V<T, m> & dim () const;
+      inline const V<T, m> & pos  () const;
+      inline const V<T, m> & dims () const;
+
+      inline V<T, m> min () const;
+      inline V<T, m> max () const;
+
+      inline V<T, m> center () const;
+      inline double  radius () const;
 
       // Volume.
       inline bool empty () const;
@@ -63,14 +69,14 @@ namespace Aa
   template <class T, unsigned int m>
   Box<T, m>::Box () :
     m_pos (),
-    m_dim ()
+    m_dims ()
   {
   }
 
   template <class T, unsigned int m>
   Box<T, m>::Box (const V<T, m> & p, const V<T, m> & d) :
     m_pos (p),
-    m_dim (V<T, m>::Max (V<T, m> (), d))
+    m_dims (std::max (V<T, m> (0), d))
   {
   }
 
@@ -97,8 +103,8 @@ namespace Aa
   template <class T, unsigned int m>
   void Box<T, m>::unite (const Box & b)
   {
-    V<T, m> minimum = V<T, m>::Min (m_pos,         b.m_pos);
-    V<T, m> maximum = V<T, m>::Max (m_pos + m_dim, b.m_pos + b.m_dim);
+    V<T, m> minimum = std::min (this->min (), b.min ());
+    V<T, m> maximum = std::max (this->max (), b.max ());
     (*this) = Box (minimum, maximum - minimum);
   }
 
@@ -119,8 +125,8 @@ namespace Aa
   template <class T, unsigned int m>
   void Box<T, m>::intersect (const Box & b)
   {
-    V<T, m> minimum = V<T, m>::Max (m_pos,         b.m_pos);
-    V<T, m> maximum = V<T, m>::Min (m_pos + m_dim, b.m_pos + b.m_dim);
+    V<T, m> minimum = std::max (this->min (), b.min ());
+    V<T, m> maximum = std::min (this->max (), b.max ());
     (*this) = Box (minimum, maximum - minimum);
   }
 
@@ -142,7 +148,19 @@ namespace Aa
   const V<T, m> & Box<T, m>::pos () const {return m_pos;}
 
   template <class T, unsigned int m>
-  const V<T, m> & Box<T, m>::dim () const {return m_dim;}
+  const V<T, m> & Box<T, m>::dims () const {return m_dims;}
+
+  template <class T, unsigned int m>
+  V<T, m> Box<T, m>::min () const {return m_pos;}
+
+  template <class T, unsigned int m>
+  V<T, m> Box<T, m>::max () const {return m_pos + m_dims;}
+
+  template <class T, unsigned int m>
+  V<T, m> Box<T, m>::center () const {return m_pos + 0.5f * m_dims;}
+
+  template <class T, unsigned int m>
+  double Box<T, m>::radius () const {return 0.5f * m_dims.length ();}
 
   template <class T, unsigned int m>
   bool Box<T, m>::empty () const
@@ -153,14 +171,14 @@ namespace Aa
   template <class T, unsigned int m>
   T Box<T, m>::volume () const
   {
-    return m_dim.prod ();
+    return m_dims.prod ();
   }
 
   template <class T, unsigned int m>
   bool Box<T, m>::equals (const Box & b) const
   {
-    if (m_pos != b.m_pos) return false;
-    if (m_dim != b.m_dim) return false;
+    if (m_pos  != b.m_pos)  return false;
+    if (m_dims != b.m_dims) return false;
     return true;
   }
 
@@ -180,9 +198,9 @@ namespace Aa
   bool Box<T, m>::contains (const Box & b) const
   {
     // FIXME
-    if (b.m_pos.x < m_pos.x || b.m_pos.x + b.m_dim.x > m_pos.x + m_dim.x) return false;
-    if (b.m_pos.y < m_pos.y || b.m_pos.y + b.m_dim.y > m_pos.y + m_dim.y) return false;
-    if (b.m_pos.z < m_pos.z || b.m_pos.z + b.m_dim.z > m_pos.z + m_dim.z) return false;
+    if (b.m_pos.x < m_pos.x || b.m_pos.x + b.m_dims.x > m_pos.x + m_dims.x) return false;
+    if (b.m_pos.y < m_pos.y || b.m_pos.y + b.m_dims.y > m_pos.y + m_dims.y) return false;
+    if (b.m_pos.z < m_pos.z || b.m_pos.z + b.m_dims.z > m_pos.z + m_dims.z) return false;
     return true;
   }
 
@@ -193,14 +211,14 @@ namespace Aa
     i >>= '{';
     i >> m_pos,
     i >>= ',';
-    i >> m_dim;
+    i >> m_dims;
     i >>= '}';
   }
 
   template <class T, unsigned int m>
   void Box<T, m>::write (std::ostream & o) const
   {
-    o << '{' << m_pos << ", " << m_dim << '}';
+    o << '{' << m_pos << ", " << m_dims << '}';
   }
 
   template <class T, unsigned int m>
@@ -266,13 +284,13 @@ namespace Aa
   {
     if (! m_okay)
     {
-      m_box = Box<T, m> (v, V<T, m> ());
+      m_box = Box<T, m> (v, V<T, m> (0));
       m_okay = true;
     }
     else
     {
-      V<T, m> minimum = V<T, m>::Min (v, m_box.pos ());
-      V<T, m> maximum = V<T, m>::Max (v, m_box.pos () + m_box.dim ());
+      V<T, m> minimum = std::min (v, m_box.min ());
+      V<T, m> maximum = std::max (v, m_box.max ());
       m_box = Box<T, m> (minimum, maximum - minimum);
     }
   }

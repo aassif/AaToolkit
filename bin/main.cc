@@ -5,6 +5,7 @@
 #include <AaCmdLine>
 #include <AaMatrix>
 #include <AaImage>
+#include <AaGridIterator>
 
 using namespace std;
 using namespace Aa;
@@ -151,6 +152,13 @@ int main (int argc, char ** argv)
   {
     cerr << e.what () << endl;
   }
+#endif
+
+#if 1
+  typedef GridIterator<3> GridIt3;
+  uvec3 grid = vec (4u, 3u, 2u);
+  for (GridIt3 i = GridIt3::Begin (grid); i != GridIt3::End (grid);)
+    std::cout << *(i++) << endl;
 #endif
 
   return 0;

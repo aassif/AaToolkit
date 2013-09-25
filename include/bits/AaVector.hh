@@ -104,8 +104,8 @@ namespace Aa
       inline V<T, m-1> sub (AaUInt) const;
 
     public:
-      inline static Self Min (const Self &, const Self &);
-      inline static Self Max (const Self &, const Self &);
+//      inline static Self Min (const Self &, const Self &);
+//      inline static Self Max (const Self &, const Self &);
 
       template <class T2, AaUInt m2> friend class V;
   };
@@ -394,6 +394,7 @@ namespace Aa
     return (m_value > (*this) [k]) ? m-1 : k;
   }
 
+#if 0
   template <class T, AaUInt m>
   V<T, m> V<T, m>::Min (const V<T, m> & v1, const V<T, m> & v2)
   {
@@ -405,6 +406,7 @@ namespace Aa
   {
     return V<T, m> (Parent::Max (v1, v2), v1.m_value < v2.m_value ? v2.m_value : v1.m_value);
   }
+#endif
 
   template <class T, AaUInt m>
   V<T, m-1> V<T, m>::sub (AaUInt k) const
@@ -488,8 +490,8 @@ namespace Aa
       inline AaUInt max () const {return 0;}
 
     public:
-      inline static Self Min (const Self &, const Self &);
-      inline static Self Max (const Self &, const Self &);
+//      inline static Self Min (const Self &, const Self &);
+//      inline static Self Max (const Self &, const Self &);
 
       template <class T2, AaUInt m2> friend class V;
   };
@@ -714,6 +716,7 @@ namespace Aa
     return m_value >= v.m_value;
   }
 
+#if 0
   template <class T>
   V<T, 1> V<T, 1>::Min (const V<T, 1> & v1, const V<T, 1> & v2)
   {
@@ -725,6 +728,7 @@ namespace Aa
   {
     return v1 < v2 ? v2 : v1;
   }
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // Raccourcis. /////////////////////////////////////////////////////////////////
@@ -868,6 +872,68 @@ namespace Aa
 #endif
 
 } // namespace Aa
+
+namespace std
+{
+  
+#define AA_VECTOR_UNARY(F, T, m) \
+  inline\
+  Aa::V<T, m> F (const Aa::V<T, m> & v)\
+  {\
+    const Aa::V<T, m-1> & w = v;\
+    return Aa::V<T, m> (F (w), F (v[m-1]));\
+  }
+
+#define AA_VECTOR_UNARY_1_2_3_4(F, T) \
+  inline\
+  Aa::V<T, 1> F (const Aa::V<T, 1> & v)\
+  {\
+    return F (v[0]);\
+  }\
+  AA_VECTOR_UNARY (F, T, 2)\
+  AA_VECTOR_UNARY (F, T, 3)\
+  AA_VECTOR_UNARY (F, T, 4)\
+
+  AA_VECTOR_UNARY_1_2_3_4 (floor, float)
+  AA_VECTOR_UNARY_1_2_3_4 (floor, double)
+
+  AA_VECTOR_UNARY_1_2_3_4 (ceil,  float)
+  AA_VECTOR_UNARY_1_2_3_4 (ceil,  double)
+
+#define AA_VECTOR_BINARY(F, T, m) \
+  inline\
+  Aa::V<T, m> F (const Aa::V<T, m> & v1, const Aa::V<T, m> & v2)\
+  {\
+    const Aa::V<T, m-1> & w1 = v1;\
+    const Aa::V<T, m-1> & w2 = v2;\
+    return Aa::V<T, m> (F (w1, w2), F (v1[m-1], v2[m-1]));\
+  }
+
+#define AA_VECTOR_BINARY_2_3_4(F, T) \
+  inline\
+  Aa::V<T, 1> F (const Aa::V<T, 1> & v1, const Aa::V<T, 1> & v2)\
+  {\
+    return F (v1[0], v2[0]);\
+  }\
+  AA_VECTOR_BINARY (F, T, 2)\
+  AA_VECTOR_BINARY (F, T, 3)\
+  AA_VECTOR_BINARY (F, T, 4)\
+
+  AA_VECTOR_BINARY_2_3_4 (min, AaInt8)
+  AA_VECTOR_BINARY_2_3_4 (min, AaUInt8)
+  AA_VECTOR_BINARY_2_3_4 (min, AaInt)
+  AA_VECTOR_BINARY_2_3_4 (min, AaUInt)
+  AA_VECTOR_BINARY_2_3_4 (min, float)
+  AA_VECTOR_BINARY_2_3_4 (min, double)
+
+  AA_VECTOR_BINARY_2_3_4 (max, AaInt8)
+  AA_VECTOR_BINARY_2_3_4 (max, AaUInt8)
+  AA_VECTOR_BINARY_2_3_4 (max, AaInt)
+  AA_VECTOR_BINARY_2_3_4 (max, AaUInt)
+  AA_VECTOR_BINARY_2_3_4 (max, float)
+  AA_VECTOR_BINARY_2_3_4 (max, double)
+
+} // namespace std
 
 #endif // AA_VECTOR__H
 
