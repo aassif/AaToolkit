@@ -24,6 +24,11 @@ namespace Aa
       inline const V<AaUInt, m> & dims () const {return m_dims;}
       inline const V<T,      m> & unit () const {return m_unit;}
       inline const V<T,      m> & pos  () const {return m_pos;}
+
+      inline Box<T, m> box () const {return Box<T, m> (m_pos, m_dims * m_unit);}
+
+      inline GridIterator<m> begin () const {return GridIterator<m>::Begin (m_dims);}
+      inline GridIterator<m> end   () const {return GridIterator<m>::End   (m_dims);}
   };
 
   typedef Grid<float,  1>  grid1;

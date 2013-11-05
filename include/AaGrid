@@ -4,5 +4,6 @@
 #include "bits/AaVector.hh"
 #include "bits/AaText.hh"
 #include "bits/AaBox.hh"
+#include "bits/AaGridIterator.hh"
 #include "bits/AaGrid.hh"
 
