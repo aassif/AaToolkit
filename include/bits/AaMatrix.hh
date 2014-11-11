@@ -383,12 +383,10 @@ namespace Aa
 
   template <class T>
   AA_TOOLKIT_INLINE
-  M2<T, 4> Perspective (T vertical, T aspect, T near, T far)
+  M2<T, 4> Perspective (T vertical, T aspect, T n, T f)
   {
     T v = std::tan (0.5 * vertical);
     T h = v * aspect;
-    T n = near;
-    T f = far;
 
     return mat (vec<T> (1.0/h,     0,              0,  0),
                 vec<T> (    0, 1.0/v,              0,  0),
@@ -402,14 +400,12 @@ namespace Aa
 
   template <class T>
   AA_TOOLKIT_INLINE
-  M2<T, 4> Ortho (T left, T right, T bottom, T top, T near, T far)
+  M2<T, 4> Ortho (T left, T right, T bottom, T top, T n, T f)
   {
     T l = left;
     T r = right;
     T b = bottom;
     T t = top;
-    T n = near;
-    T f = far;
 
     return mat (vec<T> (  +2.0/(r-l),            0,            0, 0),
                 vec<T> (           0,   +2.0/(t-b),            0, 0),
