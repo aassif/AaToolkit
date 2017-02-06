@@ -94,6 +94,8 @@ namespace Aa
   {
 #ifdef AA_SMARTPOINTER_DEBUG
     std::cout << "ADS::Alloc (" << n << " * " << sizeof (T) << ")\n";
+#else
+    (void) n;
 #endif
     throw std::bad_alloc ();
     return NULL;

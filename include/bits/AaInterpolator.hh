@@ -32,11 +32,12 @@ namespace Aa
           const V<AaUInt, k-1> & d0 = d;
           const V<float,  k-1> & p0 = p;
 
-          if (i <    0) return Parent::Interpolate (data,                      d0, p0);
-          if (i >= n-1) return Parent::Interpolate (data + (n-1) * d0.prod (), d0, p0);
+          AaUInt prod = d0.prod ();
+          if (i <    0) return Parent::Interpolate (data,                d0, p0);
+          if (i >= n-1) return Parent::Interpolate (data + (n-1) * prod, d0, p0);
 
-          V<T, m> v0 = Parent::Interpolate (data + (i + 0) * d0.prod (), d0, p0);
-          V<T, m> v1 = Parent::Interpolate (data + (i + 1) * d0.prod (), d0, p0);
+          V<float, m> v0 = Parent::Interpolate (data + (i + 0) * prod, d0, p0);
+          V<float, m> v1 = Parent::Interpolate (data + (i + 1) * prod, d0, p0);
           return details::Linear (v0, v1, t);
         }
     };
@@ -88,9 +89,8 @@ namespace Aa
         for (Iterator it = Iterator::Begin (d2); it != Iterator::End (d2);)
         {
           uvec3 v2 = *(it++);
-          vec3 v1 = 0.5f + (v2 * ratio);
-          //(*s2) [v2] = interpolator (v1);
-          (*s2) [v2] = (*s1) [uvec3 (v1)];
+          vec3 v1 = (v2 + 0.5) * ratio;
+          (*s2) [v2] = interpolator (v1);
         }
       }
 
@@ -111,7 +111,7 @@ namespace Aa
       {
       }
 
-      V<float, m> operator() (const V<T, n> & p) const
+      V<float, m> operator() (const V<float, n> & p) const
       {
         return Helper::Interpolate (m_data, m_dims, p - 0.5f);
       }
