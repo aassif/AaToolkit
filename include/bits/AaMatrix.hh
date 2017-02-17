@@ -446,6 +446,34 @@ namespace Aa
     return Transform (M2<T, 4> (m2), M2<T, 4> (m1));
   }
 
+  template <class T>
+  AA_TOOLKIT_INLINE
+  M2<T, 4> Transform (const V<T, 3> & v1,
+                      const V<T, 3> & v2)
+  {
+    try
+    {
+      V<T, 3> w1 = v1.normalize ();
+      V<T, 3> w2 = v2.normalize ();
+      float dot = DotProd (w1, w2);
+
+      V<T, 3> v3 = CrossProd (w1, w2);
+      float d3 = v3.length ();
+
+      if (d3 != 0)
+      {
+        float a = std::atan2 (d3, dot);
+        return Rotation<T> (dot >= 0 ? a : M_PI - a, v3);
+      }
+      else
+        return Scale<T> (dot >= 0 ? +1 : -1);
+    }
+    catch (div_by_zero)
+    {
+      return M2<T, 4> ();
+    }
+  }
+
 ////////////////////////////////////////////////////////////////////////////////
 // LookAt<T> ///////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////

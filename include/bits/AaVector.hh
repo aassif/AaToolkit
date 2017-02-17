@@ -12,7 +12,7 @@ namespace Aa
 
   namespace details
   {
-    // Vérification d'un indice.
+    // VÃ©rification d'un indice.
     AA_TOOLKIT_INLINE
     void CheckRange (AaUInt i, AaUInt m)
       throw (std::out_of_range)
@@ -49,8 +49,8 @@ namespace Aa
       inline V (const T & = T ());
       inline V (const Parent &, const T & = T ());
       template <class U>
-      inline /* explicit */ V (const V<U, m> &);
-      // Accès aux données.
+      inline V (const V<U, m> &);
+      // AccÃ¨s aux donnÃ©es.
       inline /***/ T & operator[] (AaUInt) /***/ throw (std::out_of_range);
       inline const T & operator[] (AaUInt) const throw (std::out_of_range);
       // Swizzling.
@@ -59,27 +59,27 @@ namespace Aa
       // Addition.
       template <class U> inline Self       & operator+= (const U &);
       template <class U> inline AA_VP(T,U,m) operator+  (const U &) const;
-      // Addition membre à membre.
+      // Addition membre Ã  membre.
       template <class U> inline Self       & operator+= (const V<U, m> &);
       template <class U> inline AA_VP(T,U,m) operator+  (const V<U, m> &) const;
       // Soustraction.
       template <class U> inline Self       & operator-= (const U &);
       template <class U> inline AA_VP(T,U,m) operator-  (const U &) const;
-      // Soustraction membre à membre.
+      // Soustraction membre Ã  membre.
       template <class U> inline Self       & operator-= (const V<U, m> &);
       template <class U> inline AA_VP(T,U,m) operator-  (const V<U, m> &) const;
-      // Négation.
+      // NÃ©gation.
       inline Self operator- () const;
       // Multiplication.
       template <class U> inline Self       & operator*= (const U &);
       template <class U> inline AA_VP(T,U,m) operator*  (const U &) const;
-      // Multiplication membre à membre.
+      // Multiplication membre Ã  membre.
       template <class U> inline Self       & operator*= (const V<U, m> &);
       template <class U> inline AA_VP(T,U,m) operator*  (const V<U, m> &) const;
       // Division.
       template <class U> inline Self       & operator/= (const U &) /***/ throw (div_by_zero);
       template <class U> inline AA_VP(T,U,m) operator/  (const U &) const throw (div_by_zero);
-      // Division membre à membre.
+      // Division membre Ã  membre.
       template <class U> inline Self       & operator/= (const V<U, m> &) /***/ throw (div_by_zero);
       template <class U> inline AA_VP(T,U,m) operator/  (const V<U, m> &) const throw (div_by_zero);
       // Comparaison.
@@ -102,10 +102,6 @@ namespace Aa
       inline AaUInt max () const;
       // Sous-vecteur.
       inline V<T, m-1> sub (AaUInt) const;
-
-    public:
-//      inline static Self Min (const Self &, const Self &);
-//      inline static Self Max (const Self &, const Self &);
 
       template <class T2, AaUInt m2> friend class V;
   };
@@ -394,20 +390,6 @@ namespace Aa
     return (m_value > (*this) [k]) ? m-1 : k;
   }
 
-#if 0
-  template <class T, AaUInt m>
-  V<T, m> V<T, m>::Min (const V<T, m> & v1, const V<T, m> & v2)
-  {
-    return V<T, m> (Parent::Min (v1, v2), v1.m_value < v2.m_value ? v1.m_value : v2.m_value);
-  }
-
-  template <class T, AaUInt m>
-  V<T, m> V<T, m>::Max (const V<T, m> & v1, const V<T, m> & v2)
-  {
-    return V<T, m> (Parent::Max (v1, v2), v1.m_value < v2.m_value ? v2.m_value : v1.m_value);
-  }
-#endif
-
   template <class T, AaUInt m>
   V<T, m-1> V<T, m>::sub (AaUInt k) const
   {
@@ -442,8 +424,8 @@ namespace Aa
       // Constructeurs.
       inline V (const T & t = T ()) : m_value (t) {}
       template <class U>
-      inline /* explicit */ V (const V<U, 1> &);
-      // Accès aux données.
+      inline V (const V<U, 1> &);
+      // AccÃ¨s aux donnÃ©es.
       inline /***/ T & operator[] (AaUInt) /***/ throw (std::out_of_range);
       inline const T & operator[] (AaUInt) const throw (std::out_of_range);
       // Swizzling.
@@ -452,27 +434,27 @@ namespace Aa
       // Addition.
       template <class U> inline Self       & operator+= (const U &);
       template <class U> inline AA_VP(T,U,1) operator+  (const U &) const;
-      // Addition membre à membre.
+      // Addition membre Ã  membre.
       template <class U> inline Self       & operator+= (const V<U, 1> &);
       template <class U> inline AA_VP(T,U,1) operator+  (const V<U, 1> &) const;
       // Soustraction.
       template <class U> inline Self       & operator-= (const U &);
       template <class U> inline AA_VP(T,U,1) operator-  (const U &) const;
-      // Soustraction membre à membre.
+      // Soustraction membre Ã  membre.
       template <class U> inline Self       & operator-= (const V<U, 1> &);
       template <class U> inline AA_VP(T,U,1) operator-  (const V<U, 1> &) const;
-      // Négation.
+      // NÃ©gation.
       inline Self operator- () const;
       // Multiplication.
       template <class U> inline Self       & operator*= (const U &);
       template <class U> inline AA_VP(T,U,1) operator*  (const U &) const;
-      // Multiplication membre à membre.
+      // Multiplication membre Ã  membre.
       template <class U> inline Self       & operator*= (const V<U, 1> &);
       template <class U> inline AA_VP(T,U,1) operator*  (const V<U, 1> &) const;
       // Division.
       template <class U> inline Self       & operator/= (const U &) /***/ throw (div_by_zero);
       template <class U> inline AA_VP(T,U,1) operator/  (const U &) const throw (div_by_zero);
-      // Division membre à membre.
+      // Division membre Ã  membre.
       template <class U> inline Self       & operator/= (const V<U, 1> &) /***/ throw (div_by_zero);
       template <class U> inline AA_VP(T,U,1) operator/  (const V<U, 1> &) const throw (div_by_zero);
       // Comparaison.
@@ -488,10 +470,6 @@ namespace Aa
       // Minimum et maximum.
       inline AaUInt min () const {return 0;}
       inline AaUInt max () const {return 0;}
-
-    public:
-//      inline static Self Min (const Self &, const Self &);
-//      inline static Self Max (const Self &, const Self &);
 
       template <class T2, AaUInt m2> friend class V;
   };
@@ -716,20 +694,6 @@ namespace Aa
     return m_value >= v.m_value;
   }
 
-#if 0
-  template <class T>
-  V<T, 1> V<T, 1>::Min (const V<T, 1> & v1, const V<T, 1> & v2)
-  {
-    return v1 < v2 ? v1 : v2;
-  }
-
-  template <class T>
-  V<T, 1> V<T, 1>::Max (const V<T, 1> & v1, const V<T, 1> & v2)
-  {
-    return v1 < v2 ? v2 : v1;
-  }
-#endif
-
 ////////////////////////////////////////////////////////////////////////////////
 // Raccourcis. /////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -787,7 +751,7 @@ namespace Aa
   typedef V<bool,   4> bvec4;
 
 ////////////////////////////////////////////////////////////////////////////////
-// Opérations. /////////////////////////////////////////////////////////////////
+// OpÃ©rations. /////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
   template <class T, class U, AaUInt m>

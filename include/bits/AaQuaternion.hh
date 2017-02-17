@@ -13,7 +13,19 @@ namespace Aa
   {
     public:
       inline
-      Q (const M2<T, 3> & m = M2<T, 3> ()) :
+      Q () :
+        V<T, 4> (vec<T> (0, 0, 0, 1))
+      {
+      }
+
+      inline
+      Q (const T & angle, const V<T, 3> & axis) throw (div_by_zero) :
+        V<T, 4> (axis.normalize () * std::sin (0.5 * angle), std::cos (0.5 * angle))
+      {
+      }
+
+      inline
+      Q (const M2<T, 3> & m) :
         V<T, 4> ()
       {
         (*this) = m;
@@ -28,9 +40,9 @@ namespace Aa
       inline
       Q & operator= (const M2<T, 3> & m)
       {
-        T m00 = m (0, 0), m01 = m (0, 1), m02 = m (0, 2);
-        T m10 = m (1, 0), m11 = m (1, 1), m12 = m (1, 2);
-        T m20 = m (2, 0), m21 = m (2, 1), m22 = m (2, 2);
+        T m00 = m [0][0], m01 = m [0][1], m02 = m [0][2];
+        T m10 = m [1][0], m11 = m [1][1], m12 = m [1][2];
+        T m20 = m [2][0], m21 = m [2][1], m22 = m [2][2];
 
         if (m00 + m11 + m22 > 0)
         {
