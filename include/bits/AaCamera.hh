@@ -60,6 +60,9 @@ namespace Aa
       mat3    m_arcball_orientation;
       vec3    m_arcball_target;
 
+    private:
+      virtual float factor () const = 0;
+
     public:
       inline
       Camera () :
@@ -104,8 +107,8 @@ namespace Aa
       inline
       void fit_scene ()
       {
-        m_camera_distance = 2.0f * m_scene_radius;
-        m_camera_position = m_scene_center + m_camera_distance * m_camera_orientation[2];
+        m_camera_distance = m_scene_radius * this->factor ();
+        m_camera_position = m_scene_center + m_camera_distance * m_camera_orientation [2];
       }
 
       inline
@@ -113,7 +116,7 @@ namespace Aa
       {
         vec3 target = this->target ();
         m_camera_distance *= f;
-        m_camera_position = target + m_camera_distance * m_camera_orientation[2];
+        m_camera_position = target + m_camera_distance * m_camera_orientation [2];
       }
 
       inline
@@ -126,7 +129,7 @@ namespace Aa
       vec2 range () const
       {
         float r = m_scene_radius;
-        float d = m_camera_distance;
+        float d = DotProd (m_camera_position - m_scene_center, m_camera_orientation [2]);
         return vec2 (d > r ? d - r : 0.01f * r, d + r);
       }
 
@@ -165,6 +168,12 @@ namespace Aa
 
   class OrthoCamera : public Camera
   {
+    private:
+      virtual float factor () const
+      {
+        return 5.0f;
+      }
+
     public:
       OrthoCamera () :
         Camera ()
@@ -173,10 +182,10 @@ namespace Aa
 
       virtual mat4 projection () const
       {
-        float w = m_camera_distance * m_size [0] / m_size [1];
-        float h = m_camera_distance * 1.0f;
+        float h = m_camera_distance / this->factor ();
+        float w = h * m_size [0] / m_size [1];
         vec2  r = this->range ();
-        return Ortho (-0.5f * w, +0.5f * w, -0.5f * h, +0.5f * h, r [0], r [1]);
+        return Ortho (-w, +w, -h, +h, r [0], r [1]);
       }
   };
 
@@ -184,6 +193,12 @@ namespace Aa
   {
     private:
       float m_vertical_fov;
+
+    private:
+      virtual float factor () const
+      {
+        return 1.0f / std::tan (0.5f * m_vertical_fov);
+      }
 
     public:
       PerspectiveCamera () :
