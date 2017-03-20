@@ -340,19 +340,19 @@ namespace Aa
   AA_TOOLKIT_INLINE
   M2<T, 4> Translation (const V<T, 3> & t)
   {
-    return mat (vec<T> (1,    0,    0,    0),
-                vec<T> (0,    1,    0,    0),
-                vec<T> (0,    0,    1,    0),
-                vec<T> (t[0], t[1], t[2], 1));
+    return mat ({1, 0, 0, 0},
+                {0, 1, 0, 0},
+                {0, 0, 1, 0},
+                V<T, 4> (t, 1));
   }
 
   template <class T>
   AA_TOOLKIT_INLINE
-  M2<T, 4> Rotation (const T & angle, const V<T, 3> & axis)
+  M2<T, 4> Rotation (T angle, const V<T, 3> & axis)
     throw (div_by_zero)
   {
     V<T, 3> v = axis.normalize ();
-    const T & x = v [0], y = v [1], z = v [2];
+    T x = v [0], y = v [1], z = v [2];
     T c = std::cos (angle), s = std::sin (angle);
     return mat (vec<T> (x*x*(1-c)+c,   x*y*(1-c)+z*s, x*z*(1-c)-y*s, 0),
                 vec<T> (y*x*(1-c)-z*s, y*y*(1-c)+c,   y*z*(1-c)+x*s, 0),
@@ -372,7 +372,7 @@ namespace Aa
 
   template <class T>
   AA_TOOLKIT_INLINE
-  M2<T, 4> Scale (const T & t)
+  M2<T, 4> Scale (T t)
   {
     return Scale (V<T, 3> (t));
   }

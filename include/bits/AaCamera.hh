@@ -20,9 +20,9 @@ namespace Aa
       static quat View (enum View view)
       {
 #if 0
-        static const vec3 X = vec<float> (1.0f, 0.0f, 0.0f);
-        static const vec3 Y = vec<float> (0.0f, 1.0f, 0.0f);
-        static const vec3 Z = vec<float> (0.0f, 0.0f, 1.0f);
+        static const vec3 X = {1, 0, 0};
+        static const vec3 Y = {0, 1, 0};
+        static const vec3 Z = {0, 0, 1};
 
         static const quat LEFT   = mat3 (Rotation<float> (M_PI/2,  Y));
         static const quat RIGHT  = mat3 (Rotation<float> (M_PI/2, -Y));
@@ -36,14 +36,14 @@ namespace Aa
 
         switch (view)
         {
-          case LEFT:   return vec<float> (0, +1, 0, 1);
-          case RIGHT:  return vec<float> (0, -1, 0, 1);
+          case LEFT:   return vec4 ({0, +1, 0, 1});
+          case RIGHT:  return vec4 ({0, -1, 0, 1});
 
-          case BOTTOM: return vec<float> (-1, 0, 0, 1);
-          case TOP:    return vec<float> (+1, 0, 0, 1);
+          case BOTTOM: return vec4 ({-1, 0, 0, 1});
+          case TOP:    return vec4 ({+1, 0, 0, 1});
 
-          case BACK:   return vec<float> (0, 1, 0, 0);
-          case FRONT:  return vec<float> (0, 0, 0, 1);
+          case BACK:   return vec4 ({0, 1, 0, 0});
+          case FRONT:  return vec4 ({0, 0, 0, 1});
         }
 
         return quat ();
@@ -68,9 +68,9 @@ namespace Aa
       Camera () :
         m_size                (0u, 0u),
         m_camera_orientation  (),
-        m_camera_position     (vec<float> (0,  0, +1)),
+        m_camera_position     {0,  0, +1},
         m_camera_distance     (1.0f),
-        m_scene_center        (vec<float> (0,  0,  0)),
+        m_scene_center        {0,  0,  0},
         m_scene_radius        (1.0f),
         m_arcball             (),
         m_arcball_orientation (),

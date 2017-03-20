@@ -48,6 +48,12 @@ namespace Aa
       // Constructeurs.
       inline V (const T & = T ());
       inline V (const Parent &, const T & = T ());
+#if __cplusplus >= 201103L
+      template <class U = T>
+      inline V (std::initializer_list<U>);
+      template <class U, size_t n>
+      inline V (const U (&) [n]);
+#endif
       template <class U>
       inline V (const V<U, m> &);
       // Accès aux données.
@@ -134,6 +140,26 @@ namespace Aa
 
   template <class T, AaUInt m>
   V<T, m>::V (const Parent & p, const T & t) : Parent (p), m_value (t) {}
+
+#if __cplusplus >= 201103L
+  template <class T, AaUInt m>
+  template <class U>
+  V<T, m>::V (std::initializer_list<U> l) :
+    Parent (l),
+    m_value (l.size () >= m ? static_cast<T> (l.begin () [m-1]) : T ())
+  {
+  }
+#endif
+
+#if __cplusplus >= 201103L
+  template <class T, AaUInt m>
+  template <class U, size_t n>
+  V<T, m>::V (const U (& data) [n]) :
+    Parent (data),
+    m_value (n >= m ? static_cast<T> (data [m-1]) : T ())
+  {
+  }
+#endif
 
   template <class T, AaUInt m>
   template <class U>
@@ -423,6 +449,12 @@ namespace Aa
     public:
       // Constructeurs.
       inline V (const T & t = T ()) : m_value (t) {}
+#if __cplusplus >= 201103L
+      template <class U = T>
+      inline V (std::initializer_list<U>);
+      template <class U, size_t n>
+      inline V (const U (&) [n]);
+#endif
       template <class U>
       inline V (const V<U, 1> &);
       // Accès aux données.
@@ -473,6 +505,24 @@ namespace Aa
 
       template <class T2, AaUInt m2> friend class V;
   };
+
+#if __cplusplus >= 201103L
+  template <class T>
+  template <class U>
+  V<T, 1>::V (std::initializer_list<U> l) :
+    m_value (l.size () >= 1 ? static_cast<T> (l.begin () [0]) : T ())
+  {
+  }
+#endif
+
+#if __cplusplus >= 201103L
+  template <class T>
+  template <class U, size_t n>
+  V<T, 1>::V (const U (& data) [n]) :
+    m_value (n >= 1 ? static_cast<T> (data [0]) : T ())
+  {
+  }
+#endif
 
   template <class T>
   template <class U>

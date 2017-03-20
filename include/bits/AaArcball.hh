@@ -27,7 +27,7 @@ namespace Aa
       Arcball () :
         m_center (),
         m_radius (0.0f),
-        m_position (Aa::vec<float> (0, 0, 1))
+        m_position ({0, 0, 1})
       {
       }
 
@@ -35,7 +35,7 @@ namespace Aa
       {
         m_center   = 0.5f * d;
         m_radius   = 0.5f * std::max (d[0], d[1]);
-        //m_position = vec<float> (0, 0, 1);
+        //m_position = {0, 0, 1};
       }
 
       void init (const vec2 & p)
