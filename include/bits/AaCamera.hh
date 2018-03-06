@@ -17,7 +17,7 @@ namespace Aa
       };
 
       inline
-      static quat View (enum View view)
+      static quat Quat (enum View view)
       {
 #if 0
         static const vec3 X = {1, 0, 0};
@@ -36,11 +36,11 @@ namespace Aa
 
         switch (view)
         {
-          case LEFT:   return vec4 ({0, +1, 0, 1});
-          case RIGHT:  return vec4 ({0, -1, 0, 1});
+          case LEFT:   return vec4 ({0, -1, 0, 1});
+          case RIGHT:  return vec4 ({0, +1, 0, 1});
 
-          case BOTTOM: return vec4 ({-1, 0, 0, 1});
-          case TOP:    return vec4 ({+1, 0, 0, 1});
+          case BOTTOM: return vec4 ({+1, 0, 0, 1});
+          case TOP:    return vec4 ({-1, 0, 0, 1});
 
           case BACK:   return vec4 ({0, 1, 0, 0});
           case FRONT:  return vec4 ({0, 0, 0, 1});
@@ -92,6 +92,14 @@ namespace Aa
         this->set_scene_sphere (min + d, d.length ());
       }
 
+#if 1
+      inline
+      void set_orientation (const mat3 & m)
+      {
+        m_camera_orientation = m;
+      }
+#endif
+
       inline
       void set_orientation (const quat & q)
       {
@@ -101,7 +109,7 @@ namespace Aa
       inline
       void set_orientation (enum View view)
       {
-        m_camera_orientation = View (view).matrix ();
+        m_camera_orientation = Quat (view).matrix ();
       }
 
       inline
