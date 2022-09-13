@@ -15,7 +15,7 @@ namespace Aa
     // Vérification d'un indice.
     AA_TOOLKIT_INLINE
     void CheckRange (AaUInt i, AaUInt m)
-      throw (std::out_of_range)
+      AA_THROW (std::out_of_range)
     {
       if (i >= m)
       {
@@ -57,11 +57,11 @@ namespace Aa
       template <class U>
       inline V (const V<U, m> &);
       // Accès aux données.
-      inline /***/ T & operator[] (AaUInt) /***/ throw (std::out_of_range);
-      inline const T & operator[] (AaUInt) const throw (std::out_of_range);
+      inline /***/ T & operator[] (AaUInt) /***/ AA_THROW (std::out_of_range);
+      inline const T & operator[] (AaUInt) const AA_THROW (std::out_of_range);
       // Swizzling.
       template <AaUInt n>
-      inline V<T, n> operator() (const V<AaUInt, n> &) const throw (std::out_of_range);
+      inline V<T, n> operator() (const V<AaUInt, n> &) const AA_THROW (std::out_of_range);
       // Addition.
       template <class U> inline Self       & operator+= (const U &);
       template <class U> inline AA_VP(T,U,m) operator+  (const U &) const;
@@ -83,11 +83,11 @@ namespace Aa
       template <class U> inline Self       & operator*= (const V<U, m> &);
       template <class U> inline AA_VP(T,U,m) operator*  (const V<U, m> &) const;
       // Division.
-      template <class U> inline Self       & operator/= (const U &) /***/ throw (div_by_zero);
-      template <class U> inline AA_VP(T,U,m) operator/  (const U &) const throw (div_by_zero);
+      template <class U> inline Self       & operator/= (const U &) /***/ AA_THROW (div_by_zero);
+      template <class U> inline AA_VP(T,U,m) operator/  (const U &) const AA_THROW (div_by_zero);
       // Division membre à membre.
-      template <class U> inline Self       & operator/= (const V<U, m> &) /***/ throw (div_by_zero);
-      template <class U> inline AA_VP(T,U,m) operator/  (const V<U, m> &) const throw (div_by_zero);
+      template <class U> inline Self       & operator/= (const V<U, m> &) /***/ AA_THROW (div_by_zero);
+      template <class U> inline AA_VP(T,U,m) operator/  (const V<U, m> &) const AA_THROW (div_by_zero);
       // Comparaison.
       inline bool operator== (const Self &) const;
       inline bool operator!= (const Self &) const;
@@ -102,7 +102,7 @@ namespace Aa
       inline T      length2 () const;
       inline double length  () const;
       //template <class U>
-      inline V<double, m> normalize () const throw (div_by_zero);
+      inline V<double, m> normalize () const AA_THROW (div_by_zero);
       // Minimum et maximum.
       inline AaUInt min () const;
       inline AaUInt max () const;
@@ -166,14 +166,14 @@ namespace Aa
   V<T, m>::V (const V<U, m> & v) : Parent (v), m_value (static_cast<T> (v.m_value)) {}
 
   template <class T, AaUInt m>
-  T & V<T, m>::operator[] (AaUInt i) throw (std::out_of_range)
+  T & V<T, m>::operator[] (AaUInt i) AA_THROW (std::out_of_range)
   {
     details::CheckRange (i, m);
     return V<T, 1>::value (i);
   }
 
   template <class T, AaUInt m>
-  const T & V<T, m>::operator[] (AaUInt i) const throw (std::out_of_range)
+  const T & V<T, m>::operator[] (AaUInt i) const AA_THROW (std::out_of_range)
   {
     details::CheckRange (i, m);
     return V<T, 1>::value (i);
@@ -181,7 +181,7 @@ namespace Aa
 
   template <class T, AaUInt m>
   template <AaUInt n>
-  V<T, n> V<T, m>::operator() (const V<AaUInt, n> & v) const throw (std::out_of_range)
+  V<T, n> V<T, m>::operator() (const V<AaUInt, n> & v) const AA_THROW (std::out_of_range)
   {
     return V<T, 1>::swizzle (v, m);
   }
@@ -297,7 +297,7 @@ namespace Aa
 #if 1
   template <class T, AaUInt m>
   template <class U>
-  V<T, m> & V<T, m>::operator/= (const U & u) throw (div_by_zero)
+  V<T, m> & V<T, m>::operator/= (const U & u) AA_THROW (div_by_zero)
   {
     if (u == 0) throw div_by_zero ();
 
@@ -308,7 +308,7 @@ namespace Aa
 
   template <class T, AaUInt m>
   template <class U>
-  AA_VP(T,U,m) V<T, m>::operator/ (const U & u) const throw (div_by_zero)
+  AA_VP(T,U,m) V<T, m>::operator/ (const U & u) const AA_THROW (div_by_zero)
   {
     if (u == 0) throw div_by_zero ();
 
@@ -318,7 +318,7 @@ namespace Aa
 
   template <class T, AaUInt m>
   template <class U>
-  V<T, m> & V<T, m>::operator/= (const V<U, m> & v) throw (div_by_zero)
+  V<T, m> & V<T, m>::operator/= (const V<U, m> & v) AA_THROW (div_by_zero)
   {
     if (v.m_value == 0) throw div_by_zero ();
 
@@ -329,7 +329,7 @@ namespace Aa
 
   template <class T, AaUInt m>
   template <class U>
-  AA_VP(T,U,m) V<T, m>::operator/ (const V<U, m> & v) const throw (div_by_zero)
+  AA_VP(T,U,m) V<T, m>::operator/ (const V<U, m> & v) const AA_THROW (div_by_zero)
   {
     if (v.m_value == 0) throw div_by_zero ();
 
@@ -397,7 +397,7 @@ namespace Aa
   }
 
   template <class T, AaUInt m>
-  V<double, m> V<T, m>::normalize () const throw (div_by_zero)
+  V<double, m> V<T, m>::normalize () const AA_THROW (div_by_zero)
   {
     return (*this) / length ();
   }
@@ -444,7 +444,7 @@ namespace Aa
       inline const T & value (AaUInt i) const {return (&m_value) [i];}
 
       template <AaUInt n>
-      inline V<T, n> swizzle (const V<AaUInt, n> &, AaUInt max) const throw (std::out_of_range);
+      inline V<T, n> swizzle (const V<AaUInt, n> &, AaUInt max) const AA_THROW (std::out_of_range);
 
     public:
       // Constructeurs.
@@ -458,11 +458,11 @@ namespace Aa
       template <class U>
       inline V (const V<U, 1> &);
       // Accès aux données.
-      inline /***/ T & operator[] (AaUInt) /***/ throw (std::out_of_range);
-      inline const T & operator[] (AaUInt) const throw (std::out_of_range);
+      inline /***/ T & operator[] (AaUInt) /***/ AA_THROW (std::out_of_range);
+      inline const T & operator[] (AaUInt) const AA_THROW (std::out_of_range);
       // Swizzling.
       template <AaUInt n>
-      inline V<T, n> operator() (const V<AaUInt, n> &) const throw (std::out_of_range);
+      inline V<T, n> operator() (const V<AaUInt, n> &) const AA_THROW (std::out_of_range);
       // Addition.
       template <class U> inline Self       & operator+= (const U &);
       template <class U> inline AA_VP(T,U,1) operator+  (const U &) const;
@@ -484,11 +484,11 @@ namespace Aa
       template <class U> inline Self       & operator*= (const V<U, 1> &);
       template <class U> inline AA_VP(T,U,1) operator*  (const V<U, 1> &) const;
       // Division.
-      template <class U> inline Self       & operator/= (const U &) /***/ throw (div_by_zero);
-      template <class U> inline AA_VP(T,U,1) operator/  (const U &) const throw (div_by_zero);
+      template <class U> inline Self       & operator/= (const U &) /***/ AA_THROW (div_by_zero);
+      template <class U> inline AA_VP(T,U,1) operator/  (const U &) const AA_THROW (div_by_zero);
       // Division membre à membre.
-      template <class U> inline Self       & operator/= (const V<U, 1> &) /***/ throw (div_by_zero);
-      template <class U> inline AA_VP(T,U,1) operator/  (const V<U, 1> &) const throw (div_by_zero);
+      template <class U> inline Self       & operator/= (const V<U, 1> &) /***/ AA_THROW (div_by_zero);
+      template <class U> inline AA_VP(T,U,1) operator/  (const V<U, 1> &) const AA_THROW (div_by_zero);
       // Comparaison.
       inline bool operator== (const Self &) const;
       inline bool operator!= (const Self &) const;
@@ -533,7 +533,7 @@ namespace Aa
 
   template <class T>
   template <AaUInt n>
-  V<T, n> V<T, 1>::swizzle (const V<AaUInt, n> & v, AaUInt max) const throw (std::out_of_range)
+  V<T, n> V<T, 1>::swizzle (const V<AaUInt, n> & v, AaUInt max) const AA_THROW (std::out_of_range)
   {
     V<T, n> r;
     for (AaUInt i = 0; i < n; ++i)
@@ -546,14 +546,14 @@ namespace Aa
   }
 
   template <class T>
-  T & V<T, 1>::operator[] (AaUInt i) throw (std::out_of_range)
+  T & V<T, 1>::operator[] (AaUInt i) AA_THROW (std::out_of_range)
   {
     details::CheckRange (i, 1);
     return m_value;
   }
 
   template <class T>
-  const T & V<T, 1>::operator[] (AaUInt i) const throw (std::out_of_range)
+  const T & V<T, 1>::operator[] (AaUInt i) const AA_THROW (std::out_of_range)
   {
     details::CheckRange (i, 1);
     return m_value;
@@ -561,7 +561,7 @@ namespace Aa
 
   template <class T>
   template <AaUInt n>
-  V<T, n> V<T, 1>::operator() (const V<AaUInt, n> & v) const throw (std::out_of_range)
+  V<T, n> V<T, 1>::operator() (const V<AaUInt, n> & v) const AA_THROW (std::out_of_range)
   {
     return V<T, 1>::swizzle (v, 1);
   }
@@ -671,7 +671,7 @@ namespace Aa
 #if 1
   template <class T>
   template <class U>
-  V<T, 1> & V<T, 1>::operator/= (const U & u) throw (div_by_zero)
+  V<T, 1> & V<T, 1>::operator/= (const U & u) AA_THROW (div_by_zero)
   {
     if (u == 0) throw div_by_zero ();
 
@@ -681,7 +681,7 @@ namespace Aa
 
   template <class T>
   template <class U>
-  AA_VP(T,U,1) V<T, 1>::operator/ (const U & u) const throw (div_by_zero)
+  AA_VP(T,U,1) V<T, 1>::operator/ (const U & u) const AA_THROW (div_by_zero)
   {
     if (u == 0) throw div_by_zero ();
 
@@ -691,7 +691,7 @@ namespace Aa
 
   template <class T>
   template <class U>
-  V<T, 1> & V<T, 1>::operator/= (const V<U, 1> & v) throw (div_by_zero)
+  V<T, 1> & V<T, 1>::operator/= (const V<U, 1> & v) AA_THROW (div_by_zero)
   {
     if (v.m_value == 0) throw div_by_zero ();
 
@@ -701,7 +701,7 @@ namespace Aa
 
   template <class T>
   template <class U>
-  AA_VP(T,U,1) V<T, 1>::operator/ (const V<U, 1> & v) const throw (div_by_zero)
+  AA_VP(T,U,1) V<T, 1>::operator/ (const V<U, 1> & v) const AA_THROW (div_by_zero)
   {
     if (v.m_value == 0) throw div_by_zero ();
 

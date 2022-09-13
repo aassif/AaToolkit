@@ -65,9 +65,9 @@ namespace Aa
       inline XmlParser ();
       inline XmlParser (const XmlId & key, XmlParser * parent = NULL);
       inline virtual ~XmlParser ();
-      inline virtual void parse (const XmlAttribs &)                 throw (ParseError);
-      inline virtual void parse (                    std::istream &) throw (ParseError);
-      inline virtual void parse (const XmlAttribs &, std::istream &) throw (ParseError);
+      inline virtual void parse (const XmlAttribs &)                 AA_THROW (ParseError);
+      inline virtual void parse (                    std::istream &) AA_THROW (ParseError);
+      inline virtual void parse (const XmlAttribs &, std::istream &) AA_THROW (ParseError);
 
     public:
       inline static void      ParseHeader (std::istream &);
@@ -77,11 +77,11 @@ namespace Aa
       inline static XmlString ParseText   (std::istream &);
       inline static XmlTag    ParseTag    (std::istream &);
       inline static void      Skip        (std::istream &, const XmlId &);
-      inline static void      ParseRoot   (std::istream &, XmlParser *) throw (ParseError);
+      inline static void      ParseRoot   (std::istream &, XmlParser *) AA_THROW (ParseError);
 
-      inline static int           ParseInt (const XmlString &)    throw (ParseError);
-      inline static unsigned char ParseHex (char c)               throw (ParseError);
-      inline static unsigned char ParseHex (char high, char low)  throw (ParseError);
+      inline static int           ParseInt (const XmlString &)    AA_THROW (ParseError);
+      inline static unsigned char ParseHex (char c)               AA_THROW (ParseError);
+      inline static unsigned char ParseHex (char high, char low)  AA_THROW (ParseError);
   };
 
   template <class Data>
@@ -158,12 +158,12 @@ namespace Aa
   }
 
   void XmlParser::parse (const XmlAttribs &)
-    throw (ParseError)
+    AA_THROW (ParseError)
   {
   }
 
   void XmlParser::parse (std::istream & is)
-    throw (ParseError)
+    AA_THROW (ParseError)
   {
     ParseText (is);
     XmlTag tag = ParseTag (is);
@@ -189,7 +189,7 @@ namespace Aa
   }
 
   void XmlParser::parse (const XmlAttribs & attribs, std::istream & is)
-    throw (ParseError)
+    AA_THROW (ParseError)
   {
     this->parse (attribs);
     this->parse (is);
@@ -350,7 +350,7 @@ namespace Aa
   }
 
   void XmlParser::ParseRoot (std::istream & is, XmlParser * p)
-    throw (ParseError)
+    AA_THROW (ParseError)
   {
     // Parse XML header.
     XmlParser::ParseHeader (is);
@@ -363,7 +363,7 @@ namespace Aa
   }
 
   int XmlParser::ParseInt (const XmlString & xml)
-    throw (ParseError)
+    AA_THROW (ParseError)
   {
     int value;
     std::istringstream iss (xml);
@@ -372,7 +372,7 @@ namespace Aa
   }
 
   unsigned char XmlParser::ParseHex (char c)
-    throw (ParseError)
+    AA_THROW (ParseError)
   {
     switch (c)
     {
@@ -399,7 +399,7 @@ namespace Aa
   }
 
   unsigned char XmlParser::ParseHex (char high, char low)
-    throw (ParseError)
+    AA_THROW (ParseError)
   {
     return 16 * ParseHex (high) + ParseHex (low);
   }

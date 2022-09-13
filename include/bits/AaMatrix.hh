@@ -303,7 +303,7 @@ namespace Aa
       }
 
       inline
-      M2<double, m> inv () const throw (div_by_zero)
+      M2<double, m> inv () const AA_THROW (div_by_zero)
       {
         T d = this->det ();
         if (d == 0) throw div_by_zero ();
@@ -324,7 +324,7 @@ namespace Aa
       inline T det () const {return (*this) [0][0];};
 
       inline
-      M2<double, 1> inv () const throw (div_by_zero)
+      M2<double, 1> inv () const AA_THROW (div_by_zero)
       {
         T d = this->det ();
         if (d == 0) throw div_by_zero ();
@@ -349,7 +349,7 @@ namespace Aa
   template <class T>
   AA_TOOLKIT_INLINE
   M2<T, 4> Rotation (T angle, const V<T, 3> & axis)
-    throw (div_by_zero)
+    AA_THROW (div_by_zero)
   {
     V<T, 3> v = axis.normalize ();
     T x = v [0], y = v [1], z = v [2];

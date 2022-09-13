@@ -199,5 +199,11 @@ namespace Aa
 
 }
 
+#if __cplusplus >= 201703L
+  #define AA_THROW(...) //noexcept(false)
+#else
+  #define AA_THROW(...) throw (__VA_ARGS__)
+#endif
+
 #endif // AA_EXCEPTION__H
 

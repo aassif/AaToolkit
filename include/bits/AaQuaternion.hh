@@ -19,7 +19,7 @@ namespace Aa
       }
 
       inline
-      Q (const T & angle, const V<T, 3> & axis) throw (div_by_zero) :
+      Q (const T & angle, const V<T, 3> & axis) AA_THROW (div_by_zero) :
         V<T, 4> (axis.normalize () * std::sin (0.5 * angle), std::cos (0.5 * angle))
       {
       }

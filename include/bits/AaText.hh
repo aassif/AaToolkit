@@ -14,33 +14,33 @@ namespace Aa
     /** @exception ParseError if the character does not match the expected one */
     inline
     void expect (std::istream & i       /** the input stream */,
-                 unsigned char expected /** the expected character */) throw (ParseError);
+                 unsigned char expected /** the expected character */) AA_THROW (ParseError);
 
     /// Expects a given string from a stream.
     /** @exception ParseError if the string does not match the expected one */
     inline
     void expect (std::istream & i             /** the input stream */,
-                 const std::string & expected /** the expected string */) throw (ParseError);
+                 const std::string & expected /** the expected string */) AA_THROW (ParseError);
 
     /// Expectation operator.
     /** \sa void expect (istream & i, unsigned char expected) throw (ParseError)
         @exception ParseError if the character does not match the expected one */
     inline
     void operator>>= (std::istream & i       /** the input stream */,
-                      unsigned char expected /** the expected string */) throw (ParseError);
+                      unsigned char expected /** the expected string */) AA_THROW (ParseError);
 
     /// Expectation operator.
     /** \sa void expect (istream & i, const string & expected) throw (ParseError)
         @exception ParseError if the string does not match the expected one */
     inline
     void operator>>= (std::istream & i             /** the input stream */,
-                      const std::string & expected /** the expected string */) throw (ParseError);
+                      const std::string & expected /** the expected string */) AA_THROW (ParseError);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Aa::TextParsing::expect /////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-    void expect (std::istream & i, unsigned char expected) throw (ParseError)
+    void expect (std::istream & i, unsigned char expected) AA_THROW (ParseError)
     {
       unsigned char c;
       i >> c;
@@ -56,7 +56,7 @@ namespace Aa
         }
     }
 
-    void expect (std::istream & i, const std::string & expected) throw (ParseError)
+    void expect (std::istream & i, const std::string & expected) AA_THROW (ParseError)
     {
       std::string s;
       i >> s;
@@ -78,12 +78,12 @@ namespace Aa
 // Aa::TextParsing::operator>>= ////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-    void operator>>= (std::istream & i, unsigned char expected) throw (ParseError)
+    void operator>>= (std::istream & i, unsigned char expected) AA_THROW (ParseError)
     {
       Aa::TextParsing::expect (i, expected);
     }
 
-    void operator>>= (std::istream & i, const std::string & expected) throw (ParseError)
+    void operator>>= (std::istream & i, const std::string & expected) AA_THROW (ParseError)
     {
       Aa::TextParsing::expect (i, expected);
     }

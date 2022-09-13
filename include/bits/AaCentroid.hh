@@ -22,7 +22,7 @@ namespace Aa
 
       inline static
       V<T, m> Centroid (const V<T, m> & v1, double w1,
-                        const V<T, m> & v2, double w2) throw (div_by_zero);
+                        const V<T, m> & v2, double w2) AA_THROW (div_by_zero);
 
       inline static
       V<T, m> Centroid (const V<T, m> & v1,
@@ -32,7 +32,7 @@ namespace Aa
       inline static
       V<T, m> Centroid (const V<T, m> & v1, double w1,
                         const V<T, m> & v2, double w2,
-                        const V<T, m> & v3, double w3) throw (div_by_zero);
+                        const V<T, m> & v3, double w3) AA_THROW (div_by_zero);
 
     private:
       V<T, m> m_point;
@@ -42,7 +42,7 @@ namespace Aa
       inline CentroidHelper ();
       inline void reset ();
       inline void feed (const V<T, m> &, double w = 1.0);
-      inline V<T, m> get () const throw (div_by_zero);
+      inline V<T, m> get () const AA_THROW (div_by_zero);
   };
 
   template <class T, unsigned int m>
@@ -53,7 +53,7 @@ namespace Aa
 
   template <class T, unsigned int m>
   V<T, m> CentroidHelper<T, m>::Centroid (const V<T, m> & v1, double w1,
-                                          const V<T, m> & v2, double w2) throw (div_by_zero)
+                                          const V<T, m> & v2, double w2) AA_THROW (div_by_zero)
   {
     return (v1 * w1 + v2 * w2) / (w1 + w2);
   }
@@ -67,7 +67,7 @@ namespace Aa
   template <class T, unsigned int m>
   V<T, m> CentroidHelper<T, m>::Centroid (const V<T, m> & v1, double w1,
                                           const V<T, m> & v2, double w2,
-                                          const V<T, m> & v3, double w3) throw (div_by_zero)
+                                          const V<T, m> & v3, double w3) AA_THROW (div_by_zero)
   {
     return (v1 * w1 + v2 * w2 + v3 * w3) / (w1 + w2 + w3);
   }
@@ -94,7 +94,7 @@ namespace Aa
   }
 
   template <class T, unsigned int m>
-  V<T, m> CentroidHelper<T, m>::get () const throw (div_by_zero)
+  V<T, m> CentroidHelper<T, m>::get () const AA_THROW (div_by_zero)
   {
     return m_point / m_weight;
   }
